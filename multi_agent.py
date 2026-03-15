@@ -932,7 +932,8 @@ def check_progress_timeout(state: Dict) -> bool:
         return False
     
     minutes_since_commit = (time.time() - last_commit_time) / 60
-    if minutes_since_commit > PROGRESS_TIMEOUT_MINUTES:
+    timeout_minutes = state.get('timeout_minutes', PROGRESS_TIMEOUT_MINUTES)
+    if minutes_since_commit > timeout_minutes:
         log('error', f"No progress in {minutes_since_commit:.0f} minutes. Stopping.")
         print(f"\n⏰ No progress in {minutes_since_commit:.0f} minutes. Stopping to prevent infinite loop.")
         return True
@@ -976,7 +977,7 @@ def main():
     parser.add_argument('--init', action='store_true', help='Create GOAL.md template')
     parser.add_argument('--once', action='store_true', help='Run one iteration and exit')
     parser.add_argument('--max', type=int, default=MAX_ITERATIONS, help='Max iterations')
-    parser.add_argument('--timeout', type=int, default=PROGRESS_TIMEOUT_MINUTES, help='Progress timeout in minutes')
+    parser.add_argument('--timeout', type=int, default=60, help='Progress timeout in minutes')
     args = parser.parse_args()
     
     if args.init:
@@ -1002,19 +1003,19 @@ Describe what you want to build here.
         print("Error: GOAL.md not found. Run with --init to create one.")
         sys.exit(1)
     
+    # Store timeout in state for check_progress_timeout to use
+    timeout_minutes = args.timeout
+    
     print("🚀 Starting Lean Multi-Agent System")
     print(f"Project: {PROJECT_DIR}")
     print(f"Goal: {GOAL_FILE.read_text().split(chr(10))[0]}")
     print(f"Max iterations: {args.max}")
-    print(f"Progress timeout: {args.timeout} minutes")
+    print(f"Progress timeout: {timeout_minutes} minutes")
     print()
-    
-    # Override global timeout with arg
-    global PROGRESS_TIMEOUT_MINUTES
-    PROGRESS_TIMEOUT_MINUTES = args.timeout
     
     iteration = 0
     state = load_state()
+    state['timeout_minutes'] = timeout_minutes
     
     while iteration < args.max:
         try:
