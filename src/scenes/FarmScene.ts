@@ -2,149 +2,114 @@ import { Scene } from 'phaser';
 import { PlayerState } from '../state/types';
 
 export class FarmScene extends Scene {
-  private player!: Phaser.GameObjects.Sprite;
-  private tiles: Phaser.GameObjects.TilemapLayer[] = [];
-  private waterCanActive = false;
-
+  private crops: Phaser.GameObjects.Group;
+  private player: Phaser.GameObjects.Sprite;
+  private playerStore: PlayerState; // Reference to actual game state
+  
   constructor() {
     super('FarmScene');
   }
 
   preload() {
-    // Load assets
-    this.load.image('tiles', 'assets/tiles.png');
-    this.load.tilemapTiledJSON('farmMap', 'assets/farm-map.json');
-    this.load.spritesheet('player', 'assets/player.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.image('waterCan', 'assets/water-can.png');
+    // Load crop assets
+    this.load.image('crop_wheat', 'assets/crops/wheat.png');
+    this.load.image('crop_carrot', 'assets/crops/carrot.png');
+    // Add other crop assets as needed
   }
 
   create() {
-    // Create tilemap
-    const map = this.make.tilemap({ key: 'farmMap' });
-    const tileset = map.addTilesetImage('tiles', 'tiles');
+    // Initialize crops group
+    this.crops = this.add.group();
     
-    // Create ground layer
-    const groundLayer = map.createLayer('Ground', tileset, 0, 0);
-    groundLayer.setCollisionByProperty({ collides: true });
-
-    // Create plant layers (for interaction)
-    this.tiles = [
-      map.createLayer('Plants1', tileset, 0, 0),
-      map.createLayer('Plants2', tileset, 0, 0),
-      map.createLayer('Plants3', tileset, 0, 0)
-    ];
-
+    // Get player state from global game store (assumed to be attached via plugin or scene system)
+    this.playerStore = this.scene.sys.game.globals.playerState;
+    
+    // Create sample crops
+    this.createCrops();
+    
     // Create player
-    this.player = this.physics.add.sprite(400, 300, 'player');
-    this.player.setCollideWorldBounds(true);
+    this.player = this.add.sprite(100, 100, 'player');
     
-    // Setup player controls
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.physics.add.collider(this.player, groundLayer);
+    // Add input for tapping on crops
+    this.input.on('pointerdown', this.handleTap.bind(this));
+  }
 
-    // Add water can interaction
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (!this.canInteract()) return;
+  private createCrops() {
+    const cropPositions = [
+      { x: 200, y: 200, type: 'wheat', stage: 3 }, // mature
+      { x: 300, y: 200, type: 'carrot', stage: 1 }, // immature
+    ];
+    
+    cropPositions.forEach(pos => {
+      const crop = this.add.sprite(pos.x, pos.y, `crop_${pos.type}`);
+      crop.setData('type', pos.type);
+      crop.setData('stage', pos.stage);
+      crop.setData('maxStage', 3); 
+      crop.setInteractive({ useHandCursor: true });
       
-      const tile = this.getTileAtPointer(pointer);
-      if (tile && this.isWaterableTile(tile)) {
-        this.waterTile(tile);
+      this.crops.add(crop);
+    });
+  }
+
+  private handleTap(pointer: Phaser.Input.Pointer) {
+    // Check if pointer clicked on a crop
+    const crop = this.crops.getChildren().find(c => 
+      c.getBounds().contains(pointer.x, pointer.y)
+    ) as Phaser.GameObjects.Sprite;
+    
+    if (!crop) return;
+    
+    const cropType = crop.getData('type');
+    const currentStage = crop.getData('stage');
+    const maxStage = crop.getData('maxStage');
+    
+    // Only harvest if crop is mature (at max stage)
+    if (currentStage >= maxStage) {
+      // Add to player inventory
+      this.addToInventory(cropType);
+      
+      // Reduce plant state - reset to seed for regrowth
+      this.resetCropState(crop);
+      
+      // Visual feedback
+      crop.setScale(0.8);
+      this.tweens.add({
+        targets: crop,
+        alpha: 0,
+        duration: 500,
+        onComplete: () => {
+          crop.destroy();
+        }
+      });
+    }
+  }
+
+  private addToInventory(cropType: string) {
+    // Update player inventory in global state
+    // This assumes PlayerState has an updateInventory method or we can modify directly
+    if (this.playerStore && typeof this.playerStore.updateInventory === 'function') {
+      this.playerStore.updateInventory({ type: cropType, quantity: 1 });
+    } else {
+      // Fallback for direct state mutation (if using plain object)
+      if (this.playerStore.inventory) {
+        const existing = this.playerStore.inventory.find(item => item.type === cropType);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          this.playerStore.inventory.push({ type: cropType, quantity: 1 });
+        }
       }
-    });
-
-    // Show water can UI
-    this.add.image(50, 50, 'waterCan').setScale(0.5).setOrigin(0);
-    
-    // Add energy/water counter text
-    this.add.text(100, 40, 'Water: 10/10\nEnergy: 100/100', {
-      fontSize: '16px',
-      fill: '#fff'
-    });
-  }
-
-  private canInteract(): boolean {
-    // Check if player has water and energy
-    const state = this.sys.game.globals.playerState as PlayerState;
-    return (state.water > 0 && state.energy > 5);
-  }
-
-  private getTileAtPointer(pointer: Phaser.Input.Pointer): Phaser.Tilemaps.Tile | null {
-    const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y);
-    
-    for (const layer of this.tiles) {
-      const tile = layer.getTileAtWorldXY(worldPoint.x, worldPoint.y, 32, 32, false);
-      if (tile && tile.index > -1) {
-        return tile;
-      }
     }
-    return null;
+    
+    console.log(`Harvested ${cropType}!`);
   }
 
-  private isWaterableTile(tile: Phaser.Tilemaps.Tile): boolean {
-    // Check if tile has a plant that needs water (non-zero index and not fully grown)
-    const state = this.sys.game.globals.playerState as PlayerState;
-    const plantData = state.plants?.[`${tile.x},${tile.y}`];
+  private resetCropState(crop: Phaser.GameObjects.Sprite) {
+    // Reset to seed stage for regrowth (option 1 - preferred for farming game logic)
+    crop.setData('stage', 0);
     
-    return !!plantData && !plantData.isHarvestable && plantData.waterLevel < 100;
-  }
-
-  private waterTile(tile: Phaser.Tilemaps.Tile): void {
-    // Get current player state
-    const state = this.sys.game.globals.playerState as PlayerState;
-    
-    if (state.water <= 0 || state.energy <= 5) return;
-
-    // Update plant water level
-    const key = `${tile.x},${tile.y}`;
-    const updatedPlants = { ...state.plants };
-    if (!updatedPlants[key]) {
-      updatedPlants[key] = { waterLevel: 25, growthStage: 1, isHarvestable: false };
-    } else {
-      updatedPlants[key].waterLevel = Math.min(100, updatedPlants[key].waterLevel + 25);
-    }
-
-    // Update player state
-    this.sys.game.globals.playerState = {
-      ...state,
-      water: state.water - 1,
-      energy: state.energy - 5,
-      plants: updatedPlants
-    };
-
-    // Visual feedback - create splash effect
-    const splash = this.add.sprite(tile.pixelX + 16, tile.pixelY + 16, 'waterCan');
-    splash.setScale(0.3);
-    splash.alpha = 0.7;
-    this.tweens.add({
-      targets: splash,
-      alpha: 0,
-      scale: 0.5,
-      duration: 500,
-      onComplete: () => splash.destroy()
-    });
-
-    // Play water sound (if available)
-    // this.sound.play('water');
-  }
-
-  update() {
-    // Handle player movement
-    const speed = 150;
-    
-    if (this.cursors.left.isDown) {
-      this.player.setVelocityX(-speed);
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocityX(speed);
-    } else {
-      this.player.setVelocityX(0);
-    }
-
-    if (this.cursors.up.isDown) {
-      this.player.setVelocityY(-speed);
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocityY(speed);
-    } else {
-      this.player.setVelocityY(0);
-    }
+    // Note: We don't destroy the crop object immediately since we're using tween
+    // The visual destruction happens in the tween callback, but the data state is reset here
+    // so if the crop were to be re-added later (e.g., regrown), it would start at stage 0
   }
 }

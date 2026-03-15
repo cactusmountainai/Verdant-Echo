@@ -145,12 +145,12 @@
   {
     "id": "task_14",
     "description": "Implement harvest interaction in FarmScene.ts \u2014 detect mature crop on tap, add to inventory, reduce plant state",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-14T19:18:22",
-    "updated_at": "",
+    "updated_at": "2026-03-15T16:38:16",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "905d3888"
   },
   {
