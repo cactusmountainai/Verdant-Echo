@@ -1,0 +1,28 @@
+#!/bin/bash
+# Entry script for autonomous-local-llm
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+case "$1" in
+    init)
+        python3 "$SCRIPT_DIR/multi_agent.py" --init
+        ;;
+    start)
+        python3 "$SCRIPT_DIR/multi_agent.py"
+        ;;
+    once)
+        python3 "$SCRIPT_DIR/multi_agent.py" --once
+        ;;
+    logs)
+        tail -f .autonomous.log
+        ;;
+    *)
+        echo "Usage: $0 {init|start|once|logs}"
+        echo ""
+        echo "  init   - Create GOAL.md template"
+        echo "  start  - Run agent loop"
+        echo "  once   - Run one iteration"
+        echo "  logs   - Show live logs"
+        exit 1
+        ;;
+esac
