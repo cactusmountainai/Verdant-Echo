@@ -86,3 +86,14 @@
 [2026-03-14T20:14:35] [INFO] Split context into 3 chunks for summarization
 [2026-03-14T20:17:24] [INFO] ContextBuilder created chunked brief for reviewer (1008 tokens)
 [2026-03-14T20:17:40] [INFO] Reviewer PASSED task task_3
+[2026-03-14T20:17:44] [INFO] === Iteration 10 ===
+[2026-03-14T20:17:47] [INFO] Context too large (17261 tokens), using chunked summarization
+[2026-03-14T20:17:47] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T20:21:05] [INFO] ContextBuilder created chunked brief for coder (919 tokens)
+[2026-03-14T20:21:29] [INFO] Coder wrote 1 files for task task_4
+[2026-03-14T20:21:29] [INFO] Context too large (17492 tokens), using chunked summarization
+[2026-03-14T20:21:29] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T20:24:54] [INFO] ContextBuilder created chunked brief for reviewer (796 tokens)
+[2026-03-14T20:25:15] [INFO] Reviewer FAILED task task_4: Missing asset preload and input handling logic flaw
+
+1. ❌ The joystick texture `...
