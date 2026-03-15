@@ -123,12 +123,12 @@
   {
     "id": "task_12",
     "description": "Build src/data/fish.json from GOAL.md table with season, time, location, and rarity fields",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-14T19:18:22",
-    "updated_at": "",
+    "updated_at": "2026-03-15T16:34:58",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "2a992de5"
   },
   {

@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Bass",
+    "season": ["spring", "summer", "fall"],
+    "time": ["morning", "afternoon"],
+    "location": "pond",
+    "rarity": "common"
+  },
+  {
+    "name": "Trout",
+    "season": ["spring", "fall", "winter"],
+    "time": ["morning", "evening"],
+    "location": "river",
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Catfish",
+    "season": ["summer", "fall"],
+    "time": ["evening", "night"],
+    "location": "pond",
+    "rarity": "common"
+  },
+  {
+    "name": "Salmon",
+    "season": ["spring", "fall"],
+    "time": ["morning", "afternoon"],
+    "location": "river",
+    "rarity": "rare"
+  },
+  {
+    "name": "Bluegill",
+    "season": ["spring", "summer", "fall"],
+    "time": ["morning", "afternoon"],
+    "location": "pond",
+    "rarity": "common"
+  },
+  {
+    "name": "Pike",
+    "season": ["spring", "winter"],
+    "time": ["morning", "evening"],
+    "location": "river",
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Sturgeon",
+    "season": ["spring", "summer", "fall"],
+    "time": ["night"],
+    "location": "river",
+    "rarity": "legendary"
+  },
+  {
+    "name": "Goldfish",
+    "season": ["spring", "summer", "fall", "winter"],
+    "time": ["morning", "afternoon", "evening", "night"],
+    "location": "pond",
+    "rarity": "common"
+  },
+  {
+    "name": "Carp",
+    "season": ["spring", "summer", "fall", "winter"],
+    "time": ["morning", "afternoon", "evening"],
+    "location": "pond",
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Eel",
+    "season": ["summer", "fall"],
+    "time": ["night"],
+    "location": "river",
+    "rarity": "rare"
+  },
+  {
+    "name": "Tilapia",
+    "season": ["spring", "summer"],
+    "time": ["afternoon"],
+    "location": "pond",
+    "rarity": "uncommon"
+  },
+  {
+    "name": "Barramundi",
+    "season": ["summer"],
+    "time": ["morning", "evening"],
+    "location": "river",
+    "rarity": "legendary"
+  }
+]
