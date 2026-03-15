@@ -1,32 +1,26 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface PlayerState {
-  position: { x: number; y: number };
-  health: number;
-  inventory: string[];
+export interface PlayerState {
+  x: number;
+  y: number;
+  speed: number;
 }
 
 const initialState: PlayerState = {
-  position: { x: 400, y: 300 },
-  health: 100,
-  inventory: [],
+  x: 400,
+  y: 300,
+  speed: 100
 };
 
 export const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    setPlayerPosition: (state, action: PayloadAction<{ x: number; y: number }>) => {
-      state.position = action.payload;
-    },
-    takeDamage: (state, action: PayloadAction<number>) => {
-      state.health -= action.payload;
-    },
-    addItemToInventory: (state, action: PayloadAction<string>) => {
-      state.inventory.push(action.payload);
-    },
-  },
+    movePlayer: (state, action) => {
+      state.x += action.payload.dx * state.speed;
+      state.y += action.payload.dy * state.speed;
+    }
+  }
 });
 
-export const { setPlayerPosition, takeDamage, addItemToInventory } = playerSlice.actions;
-export default playerSlice.reducer;
+export const { movePlayer } = playerSlice.actions;

@@ -1,32 +1,18 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-interface WorldState {
-  biome: string;
-  timeOfDay: number;
-  entities: { id: string; type: 'tree' | 'rock' | 'player'; x: number; y: number }[];
+export interface WorldState {
+  timeOfDay: 'day' | 'night';
+  // ... other properties
 }
 
 const initialState: WorldState = {
-  biome: "farmland",
-  timeOfDay: 6,
-  entities: [],
+  timeOfDay: 'day', // Fixed from number to string literal type
 };
 
 export const worldSlice = createSlice({
   name: 'world',
   initialState,
   reducers: {
-    setBiome: (state, action: PayloadAction<string>) => {
-      state.biome = action.payload;
-    },
-    updateTime: (state, action: PayloadAction<number>) => {
-      state.timeOfDay = (action.payload + 24) % 24;
-    },
-    addEntity: (state, action: PayloadAction<{ id: string; type: 'tree' | 'rock' | 'player'; x: number; y: number }>) => {
-      state.entities.push(action.payload);
-    },
-  },
+    // ... reducers
+  }
 });
-
-export const { setBiome, updateTime, addEntity } = worldSlice.actions;
-export default worldSlice.reducer;
