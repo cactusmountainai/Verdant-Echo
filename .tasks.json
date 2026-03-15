@@ -211,12 +211,12 @@
   {
     "id": "task_20",
     "description": "Implement main.py with CLI parsing using Typer to accept input flags for all core functionalities",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T16:43:15",
-    "updated_at": "",
+    "updated_at": "2026-03-15T16:48:25",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "5719cd7b"
   },
   {
