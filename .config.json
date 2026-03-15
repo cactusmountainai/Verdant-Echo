@@ -1,0 +1,15 @@
+{
+  "local_url": "http://192.168.102.199:1234/v1/chat/completions",
+  "local_key": "not-needed",
+  "local_model": "local",
+  "local_context_tokens": 70000,
+  "optimus_url": "https://optimusprime.tailc630a5.ts.net/v1/chat/completions",
+  "optimus_key": "not-needed",
+  "optimus_model": "local",
+  "optimus_context_tokens": 8000,
+  "routing": {
+    "local_for": ["summarize", "context_building", "file_catalog", "chunk_processing"],
+    "optimus_for": ["coding", "decisions", "review", "complex_reasoning"]
+  },
+  "max_tokens": 4000
+}
