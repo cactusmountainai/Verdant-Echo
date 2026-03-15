@@ -243,3 +243,13 @@ The task requir...
 [2026-03-15T00:23:01] [INFO] Split context into 3 chunks for summarization
 [2026-03-15T00:26:23] [INFO] ContextBuilder created chunked brief for reviewer (852 tokens)
 [2026-03-15T00:27:22] [INFO] Reviewer completed task task_7
+[2026-03-15T00:27:28] [INFO] === Iteration 24 ===
+[2026-03-15T00:27:33] [INFO] Context too large (18670 tokens), using chunked summarization
+[2026-03-15T00:27:33] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:30:59] [INFO] ContextBuilder created chunked brief for coder (984 tokens)
+[2026-03-15T00:31:39] [INFO] Coder wrote 3 files for task task_8
+[2026-03-15T00:31:39] [INFO] Context too large (18428 tokens), using chunked summarization
+[2026-03-15T00:31:39] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:35:36] [INFO] ContextBuilder created chunked brief for reviewer (1059 tokens)
+[2026-03-15T00:37:52] [INFO] Reviewer improved 4 files for task task_8
+[2026-03-15T00:37:52] [INFO] Reviewer completed task task_8
