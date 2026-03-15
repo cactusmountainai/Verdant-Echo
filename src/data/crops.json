@@ -3,18 +3,24 @@
     "name": "wheat",
     "season": "spring",
     "daysToGrow": 5,
-    "price": 20
+    "price": 30
   },
   {
     "name": "carrot",
     "season": "spring",
     "daysToGrow": 7,
-    "price": 15
+    "price": 25
   },
   {
-    "name": "potato",
+    "name": "tomato",
     "season": "summer",
     "daysToGrow": 8,
-    "price": 25
+    "price": 40
+  },
+  {
+    "name": "pumpkin",
+    "season": "fall",
+    "daysToGrow": 10,
+    "price": 35
   }
 ]

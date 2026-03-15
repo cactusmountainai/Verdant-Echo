@@ -147,3 +147,12 @@ The code as descr...
 [2026-03-14T21:32:03] [INFO] Split context into 3 chunks for summarization
 [2026-03-14T21:35:29] [INFO] ContextBuilder created chunked brief for reviewer (781 tokens)
 [2026-03-14T21:35:41] [INFO] Reviewer FAILED task task_5: The requested file `src/data/crops.json` has not been created or provided in the...
+[2026-03-14T21:35:45] [INFO] === Iteration 16 ===
+[2026-03-14T21:35:48] [INFO] Context too large (18165 tokens), using chunked summarization
+[2026-03-14T21:35:48] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T21:39:23] [INFO] ContextBuilder created chunked brief for coder (686 tokens)
+[2026-03-14T21:39:37] [INFO] Coder wrote 1 files for task task_5
+[2026-03-14T21:39:37] [INFO] Context too large (18165 tokens), using chunked summarization
+[2026-03-14T21:39:37] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T21:43:12] [INFO] ContextBuilder created chunked brief for reviewer (733 tokens)
+[2026-03-14T21:43:17] [INFO] Reviewer PASSED task task_5
