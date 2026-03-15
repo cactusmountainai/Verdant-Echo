@@ -1,24 +1,21 @@
-# Agent state files that grow large
-.bulletproof-state.json
-.bulletproof-log.json
-.agent/.bulletproof-state.json
-.agent/.bulletproof-log.json
-
-# Autonomous backups
-.autonomous-backups/
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-
-# Node modules
 node_modules/
+dist/
+.DS_Store
+.env.local
+.env.*.local
 
 # IDE
-.vscode/
 .idea/
+.vscode/
+*.swp
+*.swo
 
-# OS files
-.DS_Store
-Thumbs.db
+# Logs
+logs
+*.log
+
+# Testing
+coverage/
+
+# Build artifacts
+build/

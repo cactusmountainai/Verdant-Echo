@@ -1,18 +1,22 @@
-# Verdant Echo
+# FarmSimulator Project
 
-A Stardew Valley-inspired farming RPG for mobile and web browsers.
+A multi-agent farming simulation game built with Phaser 3 and TypeScript, featuring state management with Zustand and local storage via Dexie.js.
 
-## What Is This?
+## Features
+- Multi-agent system for NPCs and player interaction
+- Persistent world state using Dexie.js (IndexedDB)
+- Modular state store with slices for player, world, and meta data
+- Scene-based architecture: Boot, Preload, FarmScene
+- Vite-powered build system
 
-Verdant Echo is a cozy farming simulation game where you:
-- Grow crops across four seasons with realistic growth cycles
-- Befriend quirky villagers with unique schedules and stories
-- Explore mines, fish rivers, and forage the wilderness
-- Build your farm from a overgrown field to a thriving homestead
-- Fall in love, get married, start a family
-- Discover the mysteries of the town and surrounding areas
+## Technologies
+- TypeScript
+- Phaser 3
+- Vite
+- Zustand
+- Dexie.js (IndexedDB wrapper)
 
-## Game Pillars
+## Setup
 
 1. **Meaningful Progression** - Every day matters. Skills improve, relationships deepen, the farm expands.
 2. **Living World** - NPCs have schedules, seasons change, weather affects gameplay.
