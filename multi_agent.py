@@ -40,7 +40,7 @@ LLM_MAX_RETRIES = 3
 LLM_RETRY_DELAY = 5  # seconds
 
 # Safety limits
-MAX_ITERATIONS = 1000  # Hard stop after 1000 iterations
+MAX_ITERATIONS = 10000  # Hard stop after 10000 iterations (run all night)
 PROGRESS_TIMEOUT_MINUTES = 60  # Stop if no commit in 60 minutes
 MAX_TASK_ATTEMPTS = 5  # Skip task after 5 attempts
 LOOP_DETECTION_WINDOW = 10  # Check last 10 iterations for loops
