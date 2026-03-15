@@ -68,6 +68,110 @@ class Task:
     review_feedback: str = ""
     attempt_count: int = 0
 
+# ==================== GITHUB INTEGRATION ====================
+
+def get_github_token() -> Optional[str]:
+    """Get GitHub token from environment."""
+    return os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+
+def github_api_request(endpoint: str, method: str = 'GET', data: Dict = None) -> Tuple[Dict, bool]:
+    """Make GitHub API request. Returns (response_data, success)."""
+    token = get_github_token()
+    if not token:
+        return {}, False
+    
+    url = f'https://api.github.com{endpoint}'
+    headers = {
+        'Authorization': f'token {token}',
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'autonomous-local-llm'
+    }
+    
+    try:
+        req = urllib.request.Request(url, headers=headers, method=method)
+        if data and method in ('POST', 'PATCH'):
+            req.add_header('Content-Type', 'application/json')
+            req.data = json.dumps(data).encode('utf-8')
+        
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode('utf-8')), True
+    except Exception as e:
+        log('warn', f'GitHub API error: {e}')
+        return {}, False
+
+def get_repo_issues(repo: str, state: str = 'all') -> List[Dict]:
+    """Get issues from GitHub repo."""
+    issues, success = github_api_request(f'/repos/{repo}/issues?state={state}')
+    return issues if success else []
+
+def create_issue(repo: str, title: str, body: str, labels: List[str] = None) -> Tuple[Dict, bool]:
+    """Create GitHub issue."""
+    data = {'title': title, 'body': body}
+    if labels:
+        data['labels'] = labels
+    return github_api_request(f'/repos/{repo}/issues', method='POST', data=data)
+
+def update_issue(repo: str, issue_number: int, state: str = None, body: str = None) -> bool:
+    """Update GitHub issue state or body."""
+    data = {}
+    if state:
+        data['state'] = state
+    if body:
+        data['body'] = body
+    _, success = github_api_request(f'/repos/{repo}/issues/{issue_number}', method='PATCH', data=data)
+    return success
+
+def sync_tasks_to_github(tasks: List[Task], repo: str) -> bool:
+    """Sync local tasks to GitHub issues."""
+    if not get_github_token():
+        return False
+    
+    try:
+        # Get existing issues
+        issues = get_repo_issues(repo)
+        issue_map = {i['title']: i for i in issues if 'pull_request' not in i}
+        
+        for task in tasks:
+            title = f"[{task.status.upper()}] {task.description[:80]}"
+            body = f"**Task ID:** {task.id}\n\n**Status:** {task.status}\n\n**Assignee:** {task.assignee or 'None'}\n\n**Attempts:** {task.attempt_count}"
+            if task.review_feedback:
+                body += f"\n\n**Feedback:** {task.review_feedback[:500]}"
+            
+            if title in issue_map:
+                # Update existing issue
+                issue = issue_map[title]
+                if task.status == TaskStatus.DONE.value:
+                    update_issue(repo, issue['number'], state='closed')
+                elif task.status == TaskStatus.SKIPPED.value:
+                    update_issue(repo, issue['number'], state='closed')
+            else:
+                # Create new issue
+                labels = ['autonomous-task']
+                if task.status == TaskStatus.IN_PROGRESS.value:
+                    labels.append('in-progress')
+                create_issue(repo, title, body, labels)
+        
+        return True
+    except Exception as e:
+        log('warn', f'Failed to sync to GitHub: {e}')
+        return False
+
+def get_repo_from_git() -> Optional[str]:
+    """Get owner/repo from git remote."""
+    try:
+        result = subprocess.run(
+            ['git', 'remote', 'get-url', 'origin'],
+            capture_output=True, text=True, cwd=PROJECT_DIR
+        )
+        url = result.stdout.strip()
+        # Parse github.com/owner/repo.git or github.com:owner/repo.git
+        if 'github.com' in url:
+            parts = url.replace(':', '/').replace('.git', '').split('/')
+            return f"{parts[-2]}/{parts[-1]}"
+    except:
+        pass
+    return None
+
 # ==================== UTILITIES ====================
 
 def log(level: str, message: str):
@@ -193,9 +297,14 @@ def load_tasks() -> List[Task]:
         return []
 
 def save_tasks(tasks: List[Task]):
-    """Save tasks to JSON"""
+    """Save tasks to JSON and sync to GitHub"""
     try:
         TASKS_FILE.write_text(json.dumps([asdict(t) for t in tasks], indent=2))
+        
+        # Sync to GitHub if token available
+        repo = get_repo_from_git()
+        if repo and get_github_token():
+            sync_tasks_to_github(tasks, repo)
     except Exception as e:
         log('error', f'Failed to save tasks: {e}')
 
