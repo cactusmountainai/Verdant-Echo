@@ -167,12 +167,12 @@
   {
     "id": "task_16",
     "description": "Create src/data/npcs.json with daily schedule patterns (location, time window, dialogue trigger) for 3 initial NPCs",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-14T19:18:22",
-    "updated_at": "",
+    "updated_at": "2026-03-15T16:42:59",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "2c2822f1"
   }
 ]

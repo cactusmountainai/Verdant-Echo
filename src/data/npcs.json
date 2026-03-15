@@ -1,0 +1,61 @@
+[
+  {
+    "id": "farmer-joe",
+    "name": "Farmer Joe",
+    "location": "farm-field",
+    "schedule": [
+      {
+        "timeWindow": "08:00-12:00",
+        "action": "tending-crops",
+        "dialogueTrigger": "morning-greeting"
+      },
+      {
+        "timeWindow": "12:00-13:00",
+        "action": "lunch-break",
+        "dialogueTrigger": "lunch-time"
+      },
+      {
+        "timeWindow": "13:00-17:00",
+        "action": "repair-fence",
+        "dialogueTrigger": "afternoon-chat"
+      }
+    ],
+    "initialDialogue": "Hey there! Need help with the crops?"
+  },
+  {
+    "id": "shopkeeper-mary",
+    "name": "Shopkeeper Mary",
+    "location": "general-store",
+    "schedule": [
+      {
+        "timeWindow": "09:00-18:00",
+        "action": "running-shop",
+        "dialogueTrigger": "store-open"
+      },
+      {
+        "timeWindow": "18:00-20:00",
+        "action": "closing-up",
+        "dialogueTrigger": "close-time"
+      }
+    ],
+    "initialDialogue": "Welcome to my shop! What can I help you with today?"
+  },
+  {
+    "id": "traveler-lena",
+    "name": "Traveler Lena",
+    "location": "village-square",
+    "schedule": [
+      {
+        "timeWindow": "10:00-14:00",
+        "action": "resting-bench",
+        "dialogueTrigger": "day-chat"
+      },
+      {
+        "timeWindow": "18:00-21:00",
+        "action": "stargazing",
+        "dialogueTrigger": "evening-stories"
+      }
+    ],
+    "initialDialogue": "The stars tonight are especially bright, aren't they?"
+  }
+]
