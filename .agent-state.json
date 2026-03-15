@@ -1,0 +1,18 @@
+{
+  "iteration": 2,
+  "history": [
+    {
+      "iteration": 1,
+      "task": "task_1",
+      "status": "Todo",
+      "agent": "coder"
+    },
+    {
+      "iteration": 2,
+      "task": "task_1",
+      "status": "Todo",
+      "agent": "coder"
+    }
+  ],
+  "context_brief": ""
+}

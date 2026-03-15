@@ -1,0 +1,162 @@
+[
+  {
+    "id": "task_1",
+    "description": "Initialize Vite + Phaser 3 project with TypeScript and create BootScene.ts",
+    "status": "Done",
+    "assignee": "coder",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "2026-03-14T19:33:53",
+    "review_feedback": "FarmScene.ts is missing and referenced in PreloadScene.ts, causing a fatal runtime error. The task requires initializing a working Vite + Phaser 3 project with BootScene, but the project will crash on launch due to an undefined scene. Creating FarmScene.ts is not optional \u2014 it\u2019s a critical dependency for the scene transition to function. Without it, the game does not work.",
+    "attempt_count": 2
+  },
+  {
+    "id": "task_2",
+    "description": "Define Redux store schema in src/state/store.ts based on GOAL.md player/world/meta structure",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_3",
+    "description": "Implement Dexie IndexedDB wrapper for saveData serialization (saveSlot, time, inventory)",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_4",
+    "description": "Create virtual joystick control system in FarmScene.ts using Phaser Input.Touch",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_5",
+    "description": "Build src/data/crops.json from the crop table in GOAL.md with season, days, price fields",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_6",
+    "description": "Create src/state/playerSchema.ts with full player stats, skills, and inventory structure (gold, energy, tools, items)",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_7",
+    "description": "Create src/state/worldSchema.ts defining farm layout, tile types, and spawn points for crops/rocks/trees",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_8",
+    "description": "Implement timeSystem.js with 10-minute ticks = 7s real time, including day/season/hour progression and sleep trigger",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_9",
+    "description": "Add auto-save on sleep logic in FarmScene.ts using Dexie.save() with save slot 1 by default",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_10",
+    "description": "Create src/data/seasons.json with season duration (days), weather patterns, and crop viability rules",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_11",
+    "description": "Implement simple water can interaction in FarmScene.ts \u2014 click/tap tile to water if player has water and energy",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_12",
+    "description": "Build src/data/fish.json from GOAL.md table with season, time, location, and rarity fields",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_13",
+    "description": "Create src/state/metaSchema.ts for game metadata (unlocked areas, achievements, playtime, save slot count)",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_14",
+    "description": "Implement harvest interaction in FarmScene.ts \u2014 detect mature crop on tap, add to inventory, reduce plant state",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_15",
+    "description": "Add sell booth UI in UIScene.tsx with inventory grid and \u201cSell All\u201d button linked to player gold update",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  },
+  {
+    "id": "task_16",
+    "description": "Create src/data/npcs.json with daily schedule patterns (location, time window, dialogue trigger) for 3 initial NPCs",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-14T19:18:22",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0
+  }
+]
