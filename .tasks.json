@@ -92,10 +92,10 @@
   {
     "id": "task_10",
     "description": "Create src/data/seasons.json with season duration (days), weather patterns, and crop viability rules",
-    "status": "Todo",
-    "assignee": "manager",
+    "status": "Done",
+    "assignee": "coder",
     "created_at": "2026-03-14T19:18:22",
-    "updated_at": "",
+    "updated_at": "2026-03-15T00:55:16",
     "review_feedback": "",
     "attempt_count": 0
   },

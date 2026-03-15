@@ -1,0 +1,50 @@
+[
+  {
+    "name": "spring",
+    "durationDays": 30,
+    "weatherPatterns": ["rain", "sun", "fog"],
+    "cropViability": {
+      "carrot": true,
+      "wheat": true,
+      "tomato": false,
+      "potato": true,
+      "corn": false
+    }
+  },
+  {
+    "name": "summer",
+    "durationDays": 30,
+    "weatherPatterns": ["sun", "rain", "storm"],
+    "cropViability": {
+      "carrot": false,
+      "wheat": true,
+      "tomato": true,
+      "potato": false,
+      "corn": true
+    }
+  },
+  {
+    "name": "fall",
+    "durationDays": 30,
+    "weatherPatterns": ["fog", "rain", "sun"],
+    "cropViability": {
+      "carrot": true,
+      "wheat": true,
+      "tomato": false,
+      "potato": true,
+      "corn": false
+    }
+  },
+  {
+    "name": "winter",
+    "durationDays": 30,
+    "weatherPatterns": ["snow", "fog"],
+    "cropViability": {
+      "carrot": false,
+      "wheat": false,
+      "tomato": false,
+      "potato": true,
+      "corn": false
+    }
+  }
+]
