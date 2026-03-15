@@ -1,5 +1,5 @@
 {
-  "iteration": 2,
+  "iteration": 4,
   "history": [
     {
       "iteration": 1,
@@ -10,6 +10,18 @@
     {
       "iteration": 2,
       "task": "task_1",
+      "status": "Todo",
+      "agent": "coder"
+    },
+    {
+      "iteration": 3,
+      "task": "task_1",
+      "status": "Done",
+      "agent": "coder"
+    },
+    {
+      "iteration": 4,
+      "task": "task_2",
       "status": "Todo",
       "agent": "coder"
     }

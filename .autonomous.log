@@ -17,3 +17,21 @@
 [2026-03-14T19:31:19] [INFO] Split context into 2 chunks for summarization
 [2026-03-14T19:33:49] [INFO] ContextBuilder created chunked brief for reviewer (782 tokens)
 [2026-03-14T19:33:53] [INFO] Reviewer PASSED task task_1
+[2026-03-14T19:33:54] [INFO] === Iteration 4 ===
+[2026-03-14T19:33:54] [INFO] Context too large (14382 tokens), using chunked summarization
+[2026-03-14T19:33:54] [INFO] Split context into 2 chunks for summarization
+[2026-03-14T19:36:17] [INFO] ContextBuilder created chunked brief for coder (976 tokens)
+[2026-03-14T19:36:44] [INFO] Coder wrote 1 files for task task_2
+[2026-03-14T19:36:44] [INFO] Context too large (14727 tokens), using chunked summarization
+[2026-03-14T19:36:44] [INFO] Split context into 2 chunks for summarization
+[2026-03-14T19:38:42] [INFO] ContextBuilder created chunked brief for reviewer (805 tokens)
+[2026-03-14T19:38:51] [INFO] Reviewer FAILED task task_2: Reducers are identity functions — no state mutations are implemented. The store ...
+[2026-03-14T19:38:52] [INFO] === Iteration 5 ===
+[2026-03-14T19:38:52] [INFO] Context too large (14834 tokens), using chunked summarization
+[2026-03-14T19:38:52] [INFO] Split context into 2 chunks for summarization
+[2026-03-14T19:41:32] [INFO] ContextBuilder created chunked brief for coder (1390 tokens)
+[2026-03-14T19:42:31] [INFO] Coder wrote 4 files for task task_2
+[2026-03-14T19:42:31] [INFO] Context too large (15287 tokens), using chunked summarization
+[2026-03-14T19:42:31] [INFO] Split context into 2 chunks for summarization
+[2026-03-14T19:45:04] [INFO] ContextBuilder created chunked brief for reviewer (987 tokens)
+[2026-03-14T19:45:09] [INFO] Reviewer PASSED task task_2
