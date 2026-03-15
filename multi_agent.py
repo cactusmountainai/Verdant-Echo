@@ -475,7 +475,7 @@ class ContextBuilderAgent:
     """Analyzes full project context and creates focused brief for next agent"""
     
     # Chunk size for hierarchical summarization (leaves room for prompt + response)
-    CHUNK_SIZE_TOKENS = 12000  # Process ~12K tokens at a time
+    CHUNK_SIZE_TOKENS = 6000  # Process ~6K tokens at a time
     
     def run(self, next_agent: AgentRole, task: Optional[Task] = None) -> Tuple[str, bool]:
         """Build context brief for the next agent. Returns (brief, success)."""
@@ -927,13 +927,24 @@ def run_iteration():
 def check_progress_timeout(state: Dict) -> bool:
     """Check if we've made progress recently. Returns True if should stop."""
     last_commit_time = state.get('last_commit_time', 0)
+    timeout_minutes = state.get('timeout_minutes', PROGRESS_TIMEOUT_MINUTES)
+    
+    # Reset stale timestamp on fresh start (if older than timeout, assume new session)
     if last_commit_time == 0:
         state['last_commit_time'] = time.time()
         return False
     
     minutes_since_commit = (time.time() - last_commit_time) / 60
-    timeout_minutes = state.get('timeout_minutes', PROGRESS_TIMEOUT_MINUTES)
+    
+    # If timestamp is older than timeout, reset it (fresh session)
     if minutes_since_commit > timeout_minutes:
+        # Check if this is first iteration (no recent history)
+        history = state.get('history', [])
+        if not history or (time.time() - history[-1].get('timestamp', 0)) > timeout_minutes * 60:
+            log('info', f"Resetting stale last_commit_time ({minutes_since_commit:.0f} min old)")
+            state['last_commit_time'] = time.time()
+            return False
+        
         log('error', f"No progress in {minutes_since_commit:.0f} minutes. Stopping.")
         print(f"\n⏰ No progress in {minutes_since_commit:.0f} minutes. Stopping to prevent infinite loop.")
         return True
@@ -1054,3 +1065,4 @@ Describe what you want to build here.
 
 if __name__ == "__main__":
     main()
+

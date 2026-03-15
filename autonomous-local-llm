@@ -1,6 +1,11 @@
 #!/bin/bash
 # Entry script for autonomous-local-llm
 
+# Source bashrc to get environment variables (GITHUB_TOKEN, etc.)
+if [ -f "$HOME/.bashrc" ]; then
+    source "$HOME/.bashrc"
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 case "$1" in
