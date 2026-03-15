@@ -1,26 +1,61 @@
-import { createSlice } from '@reduxjs/toolkit';
-
-export interface PlayerState {
-  x: number;
-  y: number;
-  speed: number;
-}
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { PlayerState } from '../types';
 
 const initialState: PlayerState = {
-  x: 400,
-  y: 300,
-  speed: 100
+  gold: 0,
+  inventory: {},
+  position: { x: 0, y: 0 },
+  level: 1,
+  experience: 0
 };
 
 export const playerSlice = createSlice({
   name: 'player',
   initialState,
   reducers: {
-    movePlayer: (state, action) => {
-      state.x += action.payload.dx * state.speed;
-      state.y += action.payload.dy * state.speed;
+    addGold: (state, action: PayloadAction<number>) => {
+      state.gold += action.payload;
+    },
+    removeGold: (state, action: PayloadAction<number>) => {
+      state.gold -= action.payload;
+    },
+    addItemToInventory: (state, action: PayloadAction<string>) => {
+      if (!state.inventory[action.payload]) {
+        state.inventory[action.payload] = 0;
+      }
+      state.inventory[action.payload]++;
+    },
+    removeItemFromInventory: (state, action: PayloadAction<string>) => {
+      if (state.inventory[action.payload] > 1) {
+        state.inventory[action.payload]--;
+      } else {
+        delete state.inventory[action.payload];
+      }
+    },
+    sellAllItems: (state) => {
+      const itemValues: Record<string, number> = {
+        'wheat': 5,
+        'carrot': 3,
+        'potato': 4,
+        'corn': 6,
+        'tomato': 8,
+        'cabbage': 7
+      };
+      
+      Object.keys(state.inventory).forEach(item => {
+        const value = itemValues[item as keyof typeof itemValues];
+        if (value !== undefined) {
+          state.gold += state.inventory[item] * value;
+        }
+        // If item has no defined value, it won't be sold (safeguard)
+      });
+      
+      // Clear inventory after selling
+      state.inventory = {};
     }
-  }
+  },
 });
 
-export const { movePlayer } = playerSlice.actions;
+export const { addGold, removeGold, addItemToInventory, removeItemFromInventory, sellAllItems } = playerSlice.actions;
+
+export default playerSlice.reducer;
