@@ -200,3 +200,46 @@ The code as descr...
 [2026-03-14T23:47:18] [WARN] LLM call attempt 2/3 failed: HTTP 400: Bad Request
 [2026-03-14T23:50:13] [INFO] ContextBuilder created chunked brief for reviewer (782 tokens)
 [2026-03-14T23:50:25] [INFO] Reviewer FAILED task task_6: The task required creating `src/state/playerSchema.ts` with the exact `PlayerSta...
+[2026-03-14T23:50:30] [INFO] === Iteration 21 ===
+[2026-03-14T23:50:34] [INFO] Context too large (18351 tokens), using chunked summarization
+[2026-03-14T23:50:34] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T23:54:09] [INFO] ContextBuilder created chunked brief for coder (967 tokens)
+[2026-03-14T23:54:20] [INFO] Coder wrote 1 files for task task_6
+[2026-03-14T23:54:20] [INFO] Context too large (18411 tokens), using chunked summarization
+[2026-03-14T23:54:20] [INFO] Split context into 3 chunks for summarization
+[2026-03-14T23:57:45] [INFO] ContextBuilder created chunked brief for reviewer (774 tokens)
+[2026-03-14T23:57:55] [INFO] Reviewer FAILED task task_6: The file `src/state/playerSchema.ts` was not provided at all.  
+
+The task requir...
+[2026-03-14T23:58:04] [INFO] === Iteration 22 ===
+[2026-03-14T23:58:09] [INFO] Context too large (18278 tokens), using chunked summarization
+[2026-03-14T23:58:09] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:02:13] [INFO] ContextBuilder created chunked brief for coder (1163 tokens)
+[2026-03-15T00:03:43] [INFO] Coder wrote 1 files for task task_7
+[2026-03-15T00:03:43] [INFO] Context too large (18987 tokens), using chunked summarization
+[2026-03-15T00:03:43] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:07:47] [INFO] ContextBuilder created chunked brief for reviewer (1082 tokens)
+[2026-03-15T00:08:04] [INFO] Reviewer FAILED task task_7: Missing critical schema definition in `worldSchema.ts` — file content not provid...
+[2026-03-15T00:08:09] [INFO] === Iteration 23 ===
+[2026-03-15T00:08:14] [INFO] Context too large (19117 tokens), using chunked summarization
+[2026-03-15T00:08:14] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:12:00] [INFO] ContextBuilder created chunked brief for coder (901 tokens)
+[2026-03-15T00:12:27] [INFO] Coder wrote 1 files for task task_7
+[2026-03-15T00:12:27] [INFO] Context too large (18675 tokens), using chunked summarization
+[2026-03-15T00:12:27] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:16:18] [INFO] === Iteration 23 ===
+[2026-03-15T00:16:18] [INFO] Context too large (18898 tokens), using chunked summarization
+[2026-03-15T00:16:18] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:16:52] [INFO] ContextBuilder created chunked brief for reviewer (975 tokens)
+[2026-03-15T00:17:29] [INFO] === Iteration 23 ===
+[2026-03-15T00:17:29] [INFO] Context too large (18898 tokens), using chunked summarization
+[2026-03-15T00:17:29] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:19:18] [INFO] === Iteration 23 ===
+[2026-03-15T00:19:18] [INFO] Context too large (18898 tokens), using chunked summarization
+[2026-03-15T00:19:18] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:22:48] [INFO] ContextBuilder created chunked brief for coder (855 tokens)
+[2026-03-15T00:23:00] [INFO] Coder wrote 1 files for task task_7
+[2026-03-15T00:23:01] [INFO] Context too large (18733 tokens), using chunked summarization
+[2026-03-15T00:23:01] [INFO] Split context into 3 chunks for summarization
+[2026-03-15T00:26:23] [INFO] ContextBuilder created chunked brief for reviewer (852 tokens)
+[2026-03-15T00:27:22] [INFO] Reviewer completed task task_7

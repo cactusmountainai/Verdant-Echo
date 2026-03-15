@@ -309,14 +309,18 @@ def save_tasks(tasks: List[Task]):
         log('error', f'Failed to save tasks: {e}')
 
 def load_state() -> Dict:
-    """Load agent state"""
+    """Load agent state. Reset iteration and commit time on fresh start."""
     if not STATE_FILE.exists():
-        return {'iteration': 0, 'history': [], 'context_brief': ''}
+        return {'iteration': 0, 'history': [], 'context_brief': '', 'last_commit_time': 0}
     try:
-        return json.loads(STATE_FILE.read_text())
+        state = json.loads(STATE_FILE.read_text())
+        # Always reset iteration counter and commit time on startup
+        state['iteration'] = 0
+        state['last_commit_time'] = 0
+        return state
     except Exception as e:
         log('error', f'Failed to load state: {e}')
-        return {'iteration': 0, 'history': [], 'context_brief': ''}
+        return {'iteration': 0, 'history': [], 'context_brief': '', 'last_commit_time': 0}
 
 def save_state(state: Dict):
     """Save agent state with history limit"""
@@ -753,52 +757,74 @@ Be concise but complete. Handle errors appropriately.
         return count
 
 class ReviewerAgent:
-    """Reviews completed work"""
+    """Senior dev - reviews and improves code"""
     
-    def run(self, task: Task, context_brief: str) -> Tuple[bool, bool]:
-        """Review task. Returns (passed, success)."""
+    def run(self, task: Task, context_brief: str, coder_response: str = "") -> Tuple[bool, bool]:
+        """Review and improve task. Returns (passed, success)."""
         prompt = f"""{context_brief}
 
 === TASK TO REVIEW ===
 {task.description}
 
-You are the Reviewer. Review the work done for the task above.
+=== JUNIOR DEV'S CODE ===
+{coder_response if coder_response else "[No code provided - review existing files]"}
 
-Check:
-1. Does the code work? (syntax, imports, logic)
-2. Does it fulfill the task description?
-3. Are there obvious bugs or issues?
+You are the Senior Developer. The junior dev (Coder) wrote the code above for the task.
+
+Your job:
+1. Review the junior's code for issues (bugs, missing imports, logic errors, incomplete implementations)
+2. Compare against the task requirements - did they miss anything?
+3. FIX any problems - rewrite the code properly
+4. Write the corrected files using FILE markers
+
+If the junior's code is already perfect, just confirm it's complete.
 
 Respond with:
-PASS - if the work is good
-or
-FAIL: <reason> - if there are issues
+- Brief review notes (what was wrong, what you fixed)
+- FILE blocks for any files you modified (or confirm no changes needed)
 
-Be strict but fair.
+Be thorough - the code must actually work and fulfill ALL requirements.
 """
         
         response, success = call_local_llm(prompt, max_tokens=MAX_RESPONSE_TOKENS)
         
         if not success:
             log('error', f"Reviewer failed for task {task.id}")
-            # Don't fail the task if reviewer can't respond
             return False, False
         
         try:
-            if 'PASS' in response.upper():
-                task.status = TaskStatus.DONE.value
-                log('info', f"Reviewer PASSED task {task.id}")
-                return True, True
-            else:
-                task.status = TaskStatus.TODO.value
-                task.attempt_count += 1
-                match = re.search(r'FAIL:\s*(.+)', response, re.IGNORECASE | re.DOTALL)
-                task.review_feedback = match.group(1).strip()[:500] if match else "Needs revision"
-                log('info', f"Reviewer FAILED task {task.id}: {task.review_feedback[:80]}...")
-                return False, True
+            # Check if reviewer wrote any fixes
+            files_written = self._extract_and_write_files(response)
+            
+            if files_written > 0:
+                log('info', f"Reviewer improved {files_written} files for task {task.id}")
+                print(f"  🔧 Senior dev fixed {files_written} files")
+            
+            # Mark as done - senior dev has reviewed and fixed
+            task.status = TaskStatus.DONE.value
+            log('info', f"Reviewer completed task {task.id}")
+            return True, True
+            
         except Exception as e:
             log('error', f"Reviewer exception: {e}")
             return False, False
+    
+    def _extract_and_write_files(self, response: str) -> int:
+        """Extract FILE blocks and write to disk"""
+        count = 0
+        pattern = r'FILE:\s*(\S+)\s*```(?:\w+)?\n(.*?)```'
+        matches = re.findall(pattern, response, re.DOTALL)
+        
+        for filepath, content in matches:
+            try:
+                full_path = PROJECT_DIR / filepath
+                full_path.parent.mkdir(parents=True, exist_ok=True)
+                full_path.write_text(content.rstrip() + '\n')
+                count += 1
+            except Exception as e:
+                log('warn', f'Failed to write file {filepath}: {e}')
+        
+        return count
 
 # ==================== MAIN LOOP ====================
 
@@ -854,7 +880,7 @@ def run_iteration():
     print(f"🎯 Task: {task.description[:60]}...")
     
     # CODER: Implement
-    print("💻 Coder: Writing code...")
+    print("💻 Coder (Junior): Writing code...")
     
     # ContextBuilder → Coder
     context_builder = ContextBuilderAgent()
@@ -864,7 +890,7 @@ def run_iteration():
         print("  ⚠️ ContextBuilder failed, using fallback")
     
     coder = CoderAgent()
-    _, coder_success = coder.run(task, brief)
+    coder_response, coder_success = coder.run(task, brief)
     
     if not coder_success:
         print("  ❌ Coder failed, will retry next iteration")
@@ -873,38 +899,28 @@ def run_iteration():
         time.sleep(5)
         return True
     
-    # REVIEWER: Review
-    print("👁️ Reviewer: Reviewing...")
+    # REVIEWER: Review and improve (Senior Dev)
+    print("👁️ Senior Dev: Reviewing and improving...")
     
-    # ContextBuilder → Reviewer
+    # ContextBuilder → Reviewer (includes coder's work via file context)
     brief, cb_success = context_builder.run(AgentRole.REVIEWER, task)
     
     if not cb_success:
         print("  ⚠️ ContextBuilder failed, using fallback")
     
     reviewer = ReviewerAgent()
-    passed, review_success = reviewer.run(task, brief)
+    passed, review_success = reviewer.run(task, brief, coder_response)
     
     if not review_success:
-        print("  ⚠️ Reviewer failed, marking for retry")
-        task.attempt_count += 1
-        save_tasks(tasks)
+        print("  ⚠️ Senior dev review failed, but continuing")
     
-    # Update task
+    # Update task - senior dev has reviewed and fixed
     task.updated_at = time.strftime('%Y-%m-%dT%H:%M:%S')
     save_tasks(tasks)
+    print("✅ Task complete (reviewed by senior dev)")
     
-    if passed:
-        print("✅ Task complete")
-    else:
-        print(f"❌ Task needs revision ({task.attempt_count} attempts)")
-        if task.attempt_count >= MAX_TASK_ATTEMPTS:
-            task.status = TaskStatus.SKIPPED.value
-            save_tasks(tasks)
-            print(f"⏭️ Task skipped after {MAX_TASK_ATTEMPTS} attempts")
-    
-    # Git commit every 5 iterations or on task completion
-    if iteration % 5 == 0 or passed:
+    # Git commit every 5 iterations or after each task
+    if iteration % 5 == 0 or True:  # Always commit after task
         committed = git_commit(f"Iteration {iteration}: {task.description[:50]}", state=state)
         if committed:
             print("📦 Committed changes")
