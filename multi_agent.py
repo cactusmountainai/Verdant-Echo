@@ -39,6 +39,12 @@ LLM_TIMEOUT = 600  # 10 minutes for local LLM
 LLM_MAX_RETRIES = 3
 LLM_RETRY_DELAY = 5  # seconds
 
+# Safety limits
+MAX_ITERATIONS = 1000  # Hard stop after 1000 iterations
+PROGRESS_TIMEOUT_MINUTES = 60  # Stop if no commit in 60 minutes
+MAX_TASK_ATTEMPTS = 5  # Skip task after 5 attempts
+LOOP_DETECTION_WINDOW = 10  # Check last 10 iterations for loops
+
 class AgentRole(Enum):
     MANAGER = "manager"
     CONTEXT_BUILDER = "context_builder"
@@ -247,7 +253,7 @@ def read_file_safe(filepath: Path, max_size: int = MAX_FILE_SIZE) -> Tuple[Optio
         log('warn', f'Error reading {filepath}: {e}')
         return f"[Error reading file: {e}]", False
 
-def git_commit(message: str, check_changes: bool = True) -> bool:
+def git_commit(message: str, check_changes: bool = True, state: Dict = None) -> bool:
     """Git commit with optional change check"""
     try:
         if check_changes:
@@ -259,6 +265,9 @@ def git_commit(message: str, check_changes: bool = True) -> bool:
                 return False
         subprocess.run(['git', 'add', '.'], cwd=PROJECT_DIR, check=True, capture_output=True)
         subprocess.run(['git', 'commit', '-m', message], cwd=PROJECT_DIR, check=True, capture_output=True)
+        # Update last commit time on success
+        if state is not None:
+            state['last_commit_time'] = time.time()
         return True
     except Exception as e:
         log('warn', f'Git commit failed: {e}')
@@ -780,14 +789,14 @@ def run_iteration():
         print("✅ Task complete")
     else:
         print(f"❌ Task needs revision ({task.attempt_count} attempts)")
-        if task.attempt_count >= 3:
+        if task.attempt_count >= MAX_TASK_ATTEMPTS:
             task.status = TaskStatus.SKIPPED.value
             save_tasks(tasks)
-            print("⏭️ Task skipped after 3 attempts")
+            print(f"⏭️ Task skipped after {MAX_TASK_ATTEMPTS} attempts")
     
     # Git commit every 5 iterations or on task completion
     if iteration % 5 == 0 or passed:
-        committed = git_commit(f"Iteration {iteration}: {task.description[:50]}")
+        committed = git_commit(f"Iteration {iteration}: {task.description[:50]}", state=state)
         if committed:
             print("📦 Committed changes")
     
@@ -796,17 +805,69 @@ def run_iteration():
         'iteration': iteration,
         'task': task.id,
         'status': task.status,
-        'agent': AgentRole.CODER.value
+        'agent': AgentRole.CODER.value,
+        'timestamp': time.time()
     })
+    # Keep only last 50 history entries
+    if len(state['history']) > 50:
+        state['history'] = state['history'][-50:]
     save_state(state)
     
     return True
+
+def check_progress_timeout(state: Dict) -> bool:
+    """Check if we've made progress recently. Returns True if should stop."""
+    last_commit_time = state.get('last_commit_time', 0)
+    if last_commit_time == 0:
+        state['last_commit_time'] = time.time()
+        return False
+    
+    minutes_since_commit = (time.time() - last_commit_time) / 60
+    if minutes_since_commit > PROGRESS_TIMEOUT_MINUTES:
+        log('error', f"No progress in {minutes_since_commit:.0f} minutes. Stopping.")
+        print(f"\n⏰ No progress in {minutes_since_commit:.0f} minutes. Stopping to prevent infinite loop.")
+        return True
+    return False
+
+def detect_loop(state: Dict, tasks: List[Task]) -> bool:
+    """Detect if we're stuck in a loop. Returns True if loop detected."""
+    history = state.get('history', [])
+    if len(history) < LOOP_DETECTION_WINDOW:
+        return False
+    
+    # Check last N iterations
+    recent = history[-LOOP_DETECTION_WINDOW:]
+    
+    # Count unique tasks
+    task_ids = [h.get('task') for h in recent]
+    unique_tasks = set(task_ids)
+    
+    # If working on same task for 10 iterations, likely stuck
+    if len(unique_tasks) == 1 and task_ids[0] is not None:
+        task_id = task_ids[0]
+        task = next((t for t in tasks if t.id == task_id), None)
+        if task and task.attempt_count >= MAX_TASK_ATTEMPTS:
+            log('warn', f"Task {task_id} stuck in loop after {MAX_TASK_ATTEMPTS} attempts")
+            print(f"\n🔄 Detected loop on task '{task.description[:40]}...'")
+            print(f"   Task attempted {task.attempt_count} times. Marking as skipped.")
+            task.status = TaskStatus.SKIPPED.value
+            save_tasks(tasks)
+            return True
+    
+    # Check for no progress (no status changes to Done)
+    done_count = sum(1 for h in recent if h.get('status') == TaskStatus.DONE.value)
+    if done_count == 0 and len(recent) >= LOOP_DETECTION_WINDOW:
+        log('warn', f"No tasks completed in last {LOOP_DETECTION_WINDOW} iterations")
+        print(f"\n⚠️ No tasks completed in last {LOOP_DETECTION_WINDOW} iterations. May be stuck.")
+    
+    return False
 
 def main():
     parser = argparse.ArgumentParser(description='Lean Multi-Agent Local LLM')
     parser.add_argument('--init', action='store_true', help='Create GOAL.md template')
     parser.add_argument('--once', action='store_true', help='Run one iteration and exit')
-    parser.add_argument('--max', type=int, default=100, help='Max iterations')
+    parser.add_argument('--max', type=int, default=MAX_ITERATIONS, help='Max iterations')
+    parser.add_argument('--timeout', type=int, default=PROGRESS_TIMEOUT_MINUTES, help='Progress timeout in minutes')
     args = parser.parse_args()
     
     if args.init:
@@ -835,11 +896,29 @@ Describe what you want to build here.
     print("🚀 Starting Lean Multi-Agent System")
     print(f"Project: {PROJECT_DIR}")
     print(f"Goal: {GOAL_FILE.read_text().split(chr(10))[0]}")
+    print(f"Max iterations: {args.max}")
+    print(f"Progress timeout: {args.timeout} minutes")
     print()
     
+    # Override global timeout with arg
+    global PROGRESS_TIMEOUT_MINUTES
+    PROGRESS_TIMEOUT_MINUTES = args.timeout
+    
     iteration = 0
+    state = load_state()
+    
     while iteration < args.max:
         try:
+            # Check progress timeout
+            if check_progress_timeout(state):
+                break
+            
+            # Check for loops
+            tasks = load_tasks()
+            if detect_loop(state, tasks):
+                # Reset state to break out of loop
+                state['last_commit_time'] = time.time()
+            
             should_continue = run_iteration()
             if not should_continue:
                 break
@@ -858,7 +937,10 @@ Describe what you want to build here.
             print(f"\n❌ Error: {e}")
             time.sleep(5)
     
-    print("\n🏁 Done")
+    if iteration >= args.max:
+        print(f"\n🏁 Reached max iterations ({args.max}). Stopping.")
+    else:
+        print("\n🏁 Done")
 
 if __name__ == "__main__":
     main()
