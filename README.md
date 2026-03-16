@@ -1,10 +1,17 @@
-# Farm Game Project
+# Meeting & Project Management Game
 
-## 📊 Project Status
-- **Architecture**: Phaser.js game with modular architecture
-- **Storage**: Dexie.js (IndexedDB) for persistent data
-- **Scenes**: Boot → Preload → Farm (main gameplay)
-- **Systems**: Time system, save/load persistence
-- **Services**: Data import, ingestion, timeline, meetings, initialization
+A Phaser.js game featuring farm scenes, project timelines, meetings, and persistent storage.
 
-## 📁 Project Structure
+## 🎮 Project Overview
+
+- **Engine:** Phaser 3
+- **Build:** Vite + TypeScript
+- **Storage:** Dexie.js (IndexedDB)
+- **Features:**
+  - Farm scene management
+  - Project timeline tracking
+  - Meeting scheduling
+  - Daily reset system
+  - Data import/ingestion
+
+## 📁 File Structure

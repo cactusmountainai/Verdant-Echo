@@ -816,7 +816,7 @@
   {
     "id": "task_75",
     "description": "Create src/systems/dailyResetSystem.ts to manage and register onDayEnd and onDayStart callback hooks for farm state resets (e.g., plant growth, energy restore).",
-    "status": "In Progress",
+    "status": "Skipped",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
     "updated_at": "2026-03-15T20:09:55",
@@ -827,12 +827,12 @@
   {
     "id": "task_76",
     "description": "Verify full crop loop (till \u2192 plant \u2192 water \u2192 sleep \u2192 grow \u2192 harvest \u2192 ship \u2192 earn) completes successfully with persistent save/load across day boundaries.",
-    "status": "Todo",
+    "status": "In Progress",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T20:12:16",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "c3d1eed9"
   }
 ]

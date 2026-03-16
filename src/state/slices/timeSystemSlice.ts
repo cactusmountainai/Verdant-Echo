@@ -1,40 +1,22 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from '../types';
+import { createSlice } from '@reduxjs/toolkit';
 
 interface TimeSystemState {
-  currentTime: number;
-  isPaused: boolean;
-  speed: number;
+  time: number;
 }
 
 const initialState: TimeSystemState = {
-  currentTime: 0,
-  isPaused: false,
-  speed: 1.0
+  time: 0,
 };
 
-export const timeSystemSlice = createSlice({
+const timeSystemSlice = createSlice({
   name: 'timeSystem',
   initialState,
   reducers: {
-    updateTime: (state, action: PayloadAction<number>) => {
-      state.currentTime = action.payload;
+    updateTime: (state, action) => {
+      state.time = action.payload;
     },
-    togglePause: (state) => {
-      state.isPaused = !state.isPaused;
-    },
-    setSpeed: (state, action: PayloadAction<number>) => {
-      state.speed = action.payload;
-    }
-  }
+  },
 });
 
-export const { updateTime, togglePause, setSpeed } = timeSystemSlice.actions;
-
-// Selectors
-export const selectTimeSystem = (state: RootState) => state.timeSystem;
-export const selectCurrentTime = (state: RootState) => state.timeSystem.currentTime;
-export const selectIsPaused = (state: RootState) => state.timeSystem.isPaused;
-export const selectSpeed = (state: RootState) => state.timeSystem.speed;
-
+export const { updateTime } = timeSystemSlice.actions;
 export default timeSystemSlice.reducer;
