@@ -497,12 +497,12 @@
   {
     "id": "task_46",
     "description": "Validate that `RootState` type is exported correctly from `src/state/types.ts` and consumed consistently across all slices without type mismatches.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:27:13",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:49:11",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "5845a105"
   }
 ]
