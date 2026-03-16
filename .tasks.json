@@ -750,12 +750,12 @@
   {
     "id": "task_69",
     "description": "Remove all imports of src/state/store.ts from files in src/state/slices/, replacing direct dispatch calls with action creators.",
-    "status": "In Progress",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:17:30",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "e5c00fb6"
   },
   {
