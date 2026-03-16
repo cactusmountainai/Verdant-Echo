@@ -88,5 +88,11 @@
     "category": "typescript",
     "timestamp": "2026-03-15T23:56:40",
     "iteration": 11
+  },
+  {
+    "lesson": "Code failed to compile: . Always run TypeScript check before marking complete.",
+    "category": "typescript",
+    "timestamp": "2026-03-16T00:01:47",
+    "iteration": 13
   }
 ]

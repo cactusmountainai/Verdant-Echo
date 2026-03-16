@@ -24,7 +24,7 @@
   {
     "id": "task_3",
     "description": "Create src/systems/tileSystem.ts with a TileState type union ('untilled'|'tilled'|'watered'|'planted'|'growing'|'harvestable'|'dead') in src/types/farm.ts. Implement canTransition(from: TileState, to: TileState, tool: ToolType) function that validates transitions (e.g., hoe \u2192 untilled\u2192tilled, wateringCan \u2192 tilled\u2192watered). Add transition() method that updates tile state and dispatches updateTile action. Acceptance: Attempting to water an 'untilled' tile rejects transition; applying hoe to 'untilled' correctly sets 'tilled'.",
-    "status": "In Progress",
+    "status": "Skipped",
     "assignee": "manager",
     "created_at": "2026-03-15T22:28:32",
     "updated_at": "2026-03-15T23:56:40",
@@ -35,12 +35,12 @@
   {
     "id": "task_4",
     "description": "Implement src/systems/toolSystem.ts with useTool(toolId: string, tileX: number, tileY: number) that consumes energy (5 per use), checks inventory for required items (e.g., seeds), and triggers tile state transitions via tileSystem.transition(). Hoe tool: untilled \u2192 tilled. WateringCan: tilled \u2192 watered. Seeds: tilled or watered \u2192 planted (consumes 1 seed from inventory). Play tool animation using Phaser Sprite with frame sequence on execution. Acceptance: Using hoe on a tile changes its state and reduces player energy by 5; planting seeds deducts one seed from inventory and sets tile to 'planted'.",
-    "status": "Todo",
+    "status": "In Progress",
     "assignee": "manager",
     "created_at": "2026-03-15T22:28:32",
-    "updated_at": "",
+    "updated_at": "2026-03-16T00:01:47",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "7e6da3a5"
   },
   {
