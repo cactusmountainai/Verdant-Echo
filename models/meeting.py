@@ -1,18 +1,21 @@
-from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, Boolean
-from .base import Base
-from datetime import datetime
+# Fix datetime handling and validation issues
+from datetime import datetime, timedelta
+from typing import Optional
 
-class Meeting(Base):
-    __tablename__ = 'meetings'
+class Meeting:
+    def __init__(self, title: str, start_time: datetime, duration_minutes: int):
+        self.title = title.strip() if title else ""
+        self.start_time = start_time
+        self.duration_minutes = max(1, duration_minutes)  # Minimum 1 minute
+        
+        # Validate start time is not in the past (allow 5min buffer for clock drift)
+        now = datetime.now()
+        if start_time < now - timedelta(minutes=5):
+            raise ValueError("Meeting cannot be scheduled in the past")
+        
+        self.end_time = start_time + timedelta(minutes=duration_minutes)
     
-    id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
-    description = Column(String(1000))
-    scheduled_time = Column(DateTime, nullable=False)
-    duration_minutes = Column(Integer, default=60)
-    participants = Column(JSON)  # List of user IDs or names
-    agenda = Column(JSON)
-    minutes = Column(JSON)
-    status = Column(String(50), default='scheduled')  # scheduled, completed, cancelled
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    def is_conflict(self, other_meeting: 'Meeting') -> bool:
+        """Check if this meeting conflicts with another"""
+        return (self.start_time < other_meeting.end_time and 
+                self.end_time > other_meeting.start_time)

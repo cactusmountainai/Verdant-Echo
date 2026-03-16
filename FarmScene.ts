@@ -1,22 +1,79 @@
-import { saveService } from '../storage/saveService';
-import { store } from '../store';
+import TimeSystem from './systems/timeSystem';
 
-export class FarmScene {
-  private hasSavedOnSleep: boolean = false;
+interface GameObject {
+  update(deltaTime: number): void;
+  render(cameraX: number, cameraY: number): void;
+}
 
-  update() {
-    const state = store.getState();
-    this.playerSprite.setPosition(state.player.x, state.player.y);
+export default class FarmScene {
+  private objects: GameObject[] = [];
+  private cameraX: number = 0;
+  private cameraY: number = 0;
+  private timeSystem: TimeSystem;
 
-    // Auto-save to slot 1 when player falls asleep (only once per sleep session)
-    if (state.player.isAsleep && !this.hasSavedOnSleep) {
-      saveService.saveGameState(1);
-      this.hasSavedOnSleep = true;
+  constructor(timeSystem: TimeSystem) {
+    this.timeSystem = timeSystem;
+    
+    // Initialize with default state
+    this.cameraX = 0;
+    this.cameraY = 0;
+  }
+
+  update(deltaTime: number): void {
+    if (!this.objects || !Array.isArray(this.objects)) {
+      console.error("FarmScene objects array is invalid");
+      return;
+    }
+    
+    for (const obj of this.objects) {
+      try {
+        obj.update(deltaTime);
+      } catch (error) {
+        console.error("Error updating game object:", error);
+      }
+    }
+  }
+
+  render(canvas: HTMLCanvasElement): void {
+    if (!canvas || !canvas.getContext) {
+      console.error("Invalid canvas element");
+      return;
     }
 
-    // Reset flag when player wakes up
-    if (!state.player.isAsleep) {
-      this.hasSavedOnSleep = false;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error("Could not get 2D context from canvas");
+      return;
     }
+
+    // Clear screen with farm green background
+    ctx.fillStyle = '#008000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Render objects relative to camera position
+    for (const obj of this.objects) {
+      try {
+        obj.render(this.cameraX, this.cameraY);
+      } catch (error) {
+        console.error("Error rendering game object:", error);
+      }
+    }
+  }
+
+  addObject(obj: GameObject): void {
+    if (!obj || typeof obj.update !== 'function' || typeof obj.render !== 'function') {
+      throw new Error("Object must have update() and render() methods");
+    }
+    
+    this.objects.push(obj);
+  }
+
+  getCameraPosition(): { x: number, y: number } {
+    return { x: this.cameraX, y: this.cameraY };
+  }
+
+  setCameraPosition(x: number, y: number): void {
+    this.cameraX = x;
+    this.cameraY = y;
   }
 }

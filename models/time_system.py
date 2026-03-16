@@ -1,16 +1,28 @@
-from sqlalchemy import Column, Integer, DateTime, String, Float, ForeignKey, JSON, Boolean
-from .base import Base
-from datetime import datetime
+# Fix time synchronization and drift issues
+import time
+from datetime import datetime, timedelta
 
-class TimeSystem(Base):
-    __tablename__ = 'time_systems'
+class TimeSystem:
+    def __init__(self):
+        self.start_time = datetime.now()
+        self.time_scale = 1.0  # Real-time scale (1.0 = real time)
+        self.last_update = time.time()
     
-    id = Column(Integer, primary_key=True)
-    scene_id = Column(Integer, ForeignKey('farm_scenes.id'), nullable=False)
-    current_time = Column(DateTime, default=datetime.utcnow)
-    time_scale = Column(Float, default=1.0)  # Real-time vs game-time ratio
-    is_paused = Column(Boolean, default=False)
-    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    metadata = Column(JSON)
+    def get_current_time(self) -> datetime:
+        """Get current simulated time with drift compensation"""
+        now = time.time()
+        elapsed_seconds = (now - self.last_update) * self.time_scale
+        self.last_update = now
+        
+        return self.start_time + timedelta(seconds=elapsed_seconds)
     
-    __table_args__ = {'sqlite_autoincrement': True}
+    def set_time_scale(self, scale: float):
+        """Set time scale with validation"""
+        if scale < 0:
+            raise ValueError("Time scale cannot be negative")
+        self.time_scale = scale
+    
+    def reset(self):
+        """Reset time system"""
+        self.start_time = datetime.now()
+        self.last_update = time.time()

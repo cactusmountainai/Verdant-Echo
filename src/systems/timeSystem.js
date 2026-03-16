@@ -1,12 +1,46 @@
-// timeSystem.js — runs in game loop; dispatches ticks every 7s
-import { store } from '../state/store';
+class TimeSystem {
+    constructor() {
+        this.startTime = Date.now();
+        this.timeScale = 1.0;
+        this.lastUpdate = performance.now();
+        this.isPaused = false;
+    }
 
-let lastTick = Date.now();
+    getCurrentTime() {
+        const now = performance.now();
+        
+        if (this.isPaused) {
+            // When paused, time doesn't advance
+            return new Date(this.startTime);
+        }
+        
+        const elapsedSeconds = ((now - this.lastUpdate) / 1000) * this.timeScale;
+        this.lastUpdate = now;
+        
+        return new Date(this.startTime + (elapsedSeconds * 1000));
+    }
 
-export function update() {
-  const now = Date.now();
-  if (now - lastTick >= 7000) { // 7 seconds = 10 minutes in-game
-    store.dispatch(worldSlice.actions.tickTime());
-    lastTick = now;
-  }
+    setTimeScale(scale) {
+        if (scale < 0) {
+            throw new Error("Time scale cannot be negative");
+        }
+        this.timeScale = scale;
+    }
+
+    pause() {
+        this.isPaused = true;
+    }
+
+    resume() {
+        this.isPaused = false;
+        this.lastUpdate = performance.now();
+    }
+
+    reset() {
+        this.startTime = Date.now();
+        this.lastUpdate = performance.now();
+        this.isPaused = false;
+    }
 }
+
+export default TimeSystem;

@@ -1,17 +1,34 @@
-from sqlalchemy import Column, Integer, String, DateTime, JSON, ForeignKey, Boolean
-from .base import Base
-from datetime import datetime
+from .project_timeline import ProjectTimeline
+from .time_system import TimeSystem
+import logging
 
-class InitTimeline(Base):
-    __tablename__ = 'init_timelines'
-    
-    id = Column(Integer, primary_key=True)
-    timeline_id = Column(Integer, ForeignKey('project_timelines.id'), nullable=False)
-    step_name = Column(String(255), nullable=False)
-    description = Column(String(1000))
-    order_index = Column(Integer, default=0)
-    is_completed = Column(Boolean, default=False)
-    due_date = Column(DateTime)
-    metadata = Column(JSON)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+# Define global variables at module level before function definition
+_timeline = None
+_time_system = None
+
+def initialize_timeline():
+    """Initialize the project timeline system"""
+    try:
+        # Initialize time system first
+        global _time_system, _timeline  # Declare as global to modify
+        
+        _time_system = TimeSystem()
+        
+        # Create and populate timeline
+        _timeline = ProjectTimeline()
+        
+        # Add default milestones (example)
+        from datetime import datetime, timedelta
+        today = datetime.now()
+        
+        _timeline.add_event(today + timedelta(days=1), "PLANNING", "Project kickoff")
+        _timeline.add_event(today + timedelta(days=7), "DEVELOPMENT", "First prototype ready")
+        _timeline.add_event(today + timedelta(days=30), "TESTING", "System testing phase")
+        _timeline.add_event(today + timedelta(days=60), "LAUNCH", "System launch")
+        
+        logging.info("Project timeline initialized successfully")
+        return _timeline
+        
+    except Exception as e:
+        logging.error(f"Failed to initialize timeline: {e}")
+        raise RuntimeError(f"Timeline initialization failed: {e}")
