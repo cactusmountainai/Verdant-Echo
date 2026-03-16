@@ -739,12 +739,12 @@
   {
     "id": "task_68",
     "description": "Enable `\"strict\": true` in tsconfig.json and verify `npm run build` exits with code 0.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:16:41",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "21047719"
   },
   {
