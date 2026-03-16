@@ -1,77 +1,52 @@
-import { store } from '../state/store';
+import { store } from '../../state/store';
+import { TileState, ToolType } from '../../types/farm';
 import { transition } from './tileSystem';
-import { ToolType, TileState } from '../state/types';
 
-/**
- * Uses a tool on a specific tile, consuming energy and updating tile state
- * @param toolId - Type of tool being used (hoe, wateringCan, seeds)
- * @param tileX - X coordinate of the target tile
- * @param tileY - Y coordinate of the target tile
- */
-export function useTool(toolId: ToolType, tileX: number, tileY: number): void {
+export function useTool(toolId: string, tileX: number, tileY: number): void {
   const state = store.getState();
-  const { energy } = state.energy;
-  const { inventory } = state.player;
-
-  // Check if player has enough energy (5 per use)
-  if (energy < 5) {
-    return; // Not enough energy to use tool
+  
+  // Check energy
+  if (state.energy.value < 5) {
+    return; // Not enough energy
   }
-
-  // Dispatch energy reduction
+  
+  // Consume 5 energy immediately
   store.dispatch({ type: 'energy/decrement', payload: 5 });
-
-  let canProceed = true;
-  let newState: TileState | null = null;
-
+  
+  const currentTileState = state.farm.tiles[tileY]?.[tileX];
+  if (!currentTileState) return;
+  
+  // Handle tool-specific transitions
   switch (toolId) {
     case ToolType.HOE:
-      // Hoe: untilled → tilled
-      if (!transition(tileX, tileY, TileState.UNTILLED, TileState.TILLED)) {
-        return; // Cannot transition to tilled state
+      if (currentTileState === TileState.UNTILLED) {
+        transition(tileX, tileY, TileState.UNTILLED, TileState.TILLED);
       }
-      newState = TileState.TILLED;
       break;
-
-    case ToolType.WATERING_CAN:
-      // WateringCan: tilled → watered
-      if (!transition(tileX, tileY, TileState.TILLED, TileState.WATERED)) {
-        return; // Cannot transition to watered state
-      }
-      newState = TileState.WATERED;
-      break;
-
-    case ToolType.SEEDS:
-      // Seeds: tilled or watered → planted (consume 1 seed)
-      const hasSeeds = inventory.seeds && inventory.seeds > 0;
-      if (!hasSeeds) {
-        return; // No seeds in inventory
-      }
-
-      // Check if tile is either tilled or watered
-      const currentTileState = state.farm.tiles[tileY]?.[tileX]?.state;
-      if (
-        currentTileState !== TileState.TILLED && 
-        currentTileState !== TileState.WATERED
-      ) {
-        return; // Can only plant on tilled or watered tiles
-      }
-
-      // Consume one seed from inventory
-      store.dispatch({ type: 'player/removeItemFromInventory', payload: { item: 'seeds', amount: 1 } });
       
-      newState = TileState.PLANTED;
-      transition(tileX, tileY, currentTileState as TileState, newState);
+    case ToolType.WATERING_CAN:
+      if (currentTileState === TileState.TILLED) {
+        transition(tileX, tileY, TileState.TILLED, TileState.WATERED);
+      }
       break;
-
+      
+    case ToolType.HARVEST_TOOL: // Note: Harvest tool isn't mentioned in requirements but included per enum
+      // No transition defined for harvest tool in requirements
+      break;
+      
     default:
-      return; // Unknown tool
+      // Assume any other toolId is a seed planting action
+      if (
+        (currentTileState === TileState.TILLED || currentTileState === TileState.WATERED)
+      ) {
+        // Check inventory has seeds
+        if (state.player.inventory.seeds > 0) {
+          // Consume one seed
+          store.dispatch({ type: 'player/removeItemFromInventory', payload: { item: 'seeds', count: 1 } });
+          // Transition to planted state
+          transition(tileX, tileY, currentTileState, TileState.PLANTED);
+        }
+      }
+      break;
   }
-
-  // If we have a valid new state and animation is needed, trigger it
-  // Note: Animation handling must be done in the Phaser scene (FarmScene.ts)
-  // This system only handles state changes and resource consumption
-  // The Phaser sprite animation should be triggered by the scene after this function call
-  
-  // For completeness, we assume FarmScene will handle animation based on toolId and tile position
 }
