@@ -2,7 +2,7 @@
   {
     "id": "task_1",
     "description": "Create src/systems/timeSystem.ts with a tick() function that advances game time by 10 minutes per call, handles hour rollover (60 minutes \u2192 next hour), and day rollover (2:00 AM \u2192 6:00 AM next day). Store current time as { hours: number, minutes: number, day: number } in Redux via timeSlice.ts. Implement dayStartAt = 6 (6:00 AM) and dayEndAt = 26 (2:00 AM next day) as constants. When tick() pushes time past 2:00 AM, trigger pass-out sequence: fade screen to black, deduct 10% of current money, reset energy to max, and advance to 6:00 AM next day. Acceptance: Calling tick() 6 times advances from 6:00 \u2192 7:00; calling it 144 times (24 hours) advances to next day at 6:00 AM with money reduced by 10% and energy restored.",
-    "status": "In Progress",
+    "status": "Skipped",
     "assignee": "manager",
     "created_at": "2026-03-15T22:28:32",
     "updated_at": "2026-03-15T22:54:35",
@@ -13,12 +13,12 @@
   {
     "id": "task_2",
     "description": "Implement src/state/slices/timeSlice.ts with initialState containing currentTime (hours=6, minutes=0, day=1), and reducers for updateTime, resetDay, and passOut. Export action creators update_time(), reset_day(), and pass_out(). Integrate with store.ts using createSlice with name: 'time' and proper TypeScript typing for TimeState interface in src/state/types.ts. Acceptance: Redux DevTools show time state updating correctly on tick() and persisting across page refresh via Dexie.",
-    "status": "Todo",
+    "status": "In Progress",
     "assignee": "manager",
     "created_at": "2026-03-15T22:28:32",
-    "updated_at": "",
+    "updated_at": "2026-03-15T23:00:56",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "79406243"
   },
   {

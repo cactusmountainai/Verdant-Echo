@@ -1,36 +1,34 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
-import { combineReducers } from '@reduxjs/toolkit';
-
-// Import reducers
-import timeSystemReducer from './slices/timeSystemSlice';
-import moneyReducer from './slices/moneySlice'; // Assuming this exists based on context
-import energyReducer from './slices/energySlice'; // Assuming this exists based on context
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import appSlice from './slices/appSlice';
+import timeSlice from './slices/timeSlice';
+import moneySlice from './slices/moneySlice';
+import energySlice from './slices/energySlice';
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['timeSystem', 'money', 'energy'], // Persist these slices
+  stateReconciler: autoMergeLevel2,
+  whitelist: ['time', 'money', 'energy'],
 };
 
-const rootReducer = combineReducers({
-  timeSystem: timeSystemReducer,
-  money: moneyReducer,
-  energy: energyReducer,
-});
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedTimeReducer = persistReducer(persistConfig, timeSlice);
+const persistedMoneyReducer = persistReducer(persistConfig, moneySlice);
+const persistedEnergyReducer = persistReducer(persistConfig, energySlice);
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: {
+    app: appSlice,
+    time: persistedTimeReducer,
+    money: persistedMoneyReducer,
+    energy: persistedEnergyReducer,
+  },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
-      },
+      serializableCheck: false,
     }),
 });
 
 export const persistor = persistStore(store);
-export type RootState = ReturnType<typeof store.getState>;
