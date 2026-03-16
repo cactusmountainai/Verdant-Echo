@@ -376,12 +376,12 @@
   {
     "id": "task_35",
     "description": "Document API endpoints and usage examples in Swagger/OpenAPI YAML format",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T17:18:28",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:17:44",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "2ee9a976"
   },
   {
