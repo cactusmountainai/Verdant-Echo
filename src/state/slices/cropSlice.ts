@@ -1,256 +1,122 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from '../store';
+import { RootState } from '../store';
 
 // Define types for crop state
-export interface Crop {
-  id: string;
+interface CropState {
   stage: 'till' | 'plant' | 'water' | 'sleep' | 'grow' | 'harvest' | 'ship' | 'earn';
-  plantedAt: number | null; // timestamp when planting occurred
-  wateredAt: number | null; // timestamp when watering occurred
-  grownAt: number | null;   // timestamp when growth completed
-  harvestedAt: number | null; // timestamp when harvesting occurred
-  shippedAt: number | null; // timestamp when shipping occurred
-  earnedAt: number | null;  // timestamp when earning occurred
-  daysToGrow: number;       // how many days it takes to grow (configurable)
-  isReadyForHarvest: boolean;
+  lastUpdated: number; // timestamp of last state change
+  plantedAt: number | null;
+  wateredAt: number | null;
+  grownAt: number | null;
+  harvestedAt: number | null;
+  shippedAt: number | null;
+  earnedAt: number | null;
+  isCompleted: boolean;
 }
 
-export interface CropState {
-  crops: Record<string, Crop>;
-  currentDay: number;
-  lastSavedDay: number;
-}
-
+// Initial state
 const initialState: CropState = {
-  crops: {},
-  currentDay: 1,
-  lastSavedDay: 1,
+  stage: 'till',
+  lastUpdated: Date.now(),
+  plantedAt: null,
+  wateredAt: null,
+  grownAt: null,
+  harvestedAt: null,
+  shippedAt: null,
+  earnedAt: null,
+  isCompleted: false,
 };
 
-// Helper function to get timestamp for now
-const getCurrentTimestamp = (): number => Date.now();
-
-// Calculate if a crop should progress based on time elapsed and day boundaries
-const shouldProgressStage = (crop: Crop, currentDay: number): Crop => {
-  const now = getCurrentTimestamp();
-  
-  // If we've moved to a new day since last saved, process progression
-  if (currentDay > (crop.plantedAt ? Math.floor((now - crop.plantedAt) / (24 * 60 * 60 * 1000)) + 1 : 0)) {
-    // This is a simplified model - we'll assume day boundaries trigger progression
-    // In reality, this would check time elapsed between stages
-    
-    // Progress based on current stage and days passed
-    switch (crop.stage) {
-      case 'till':
-        if (currentDay > crop.plantedAt ? Math.floor((now - crop.plantedAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'plant' };
-        }
-        break;
-        
-      case 'plant':
-        // After planting, we wait for water
-        if (currentDay > crop.plantedAt ? Math.floor((now - crop.plantedAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'water' };
-        }
-        break;
-        
-      case 'water':
-        // After watering, we enter sleep phase
-        if (currentDay > crop.wateredAt ? Math.floor((now - crop.wateredAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'sleep' };
-        }
-        break;
-        
-      case 'sleep':
-        // After sleep, growth begins
-        if (currentDay > crop.grownAt ? Math.floor((now - crop.grownAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'grow' };
-        }
-        break;
-        
-      case 'grow':
-        // After growing for configured days, harvest becomes ready
-        if (crop.daysToGrow && crop.plantedAt) {
-          const daysSincePlanting = Math.floor((now - crop.plantedAt) / (24 * 60 * 60 * 1000));
-          if (daysSincePlanting >= crop.daysToGrow) {
-            return { 
-              ...crop, 
-              stage: 'harvest', 
-              isReadyForHarvest: true,
-              grownAt: now
-            };
-          }
-        }
-        break;
-        
-      case 'harvest':
-        // After harvest, ship immediately
-        if (currentDay > crop.harvestedAt ? Math.floor((now - crop.harvestedAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'ship' };
-        }
-        break;
-        
-      case 'ship':
-        // After shipping, earn immediately
-        if (currentDay > crop.shippedAt ? Math.floor((now - crop.shippedAt) / (24 * 60 * 60 * 1000)) + 1 : 0) {
-          return { ...crop, stage: 'earn' };
-        }
-        break;
-        
-      case 'earn':
-        // Earned state is final
-        return crop;
-    }
-  }
-  
-  return crop;
-};
-
+// Define the crop slice
 const cropSlice = createSlice({
   name: 'crop',
   initialState,
   reducers: {
-    tillLand: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      state.crops[id] = {
-        id,
-        stage: 'till',
-        plantedAt: null,
-        wateredAt: null,
-        grownAt: null,
-        harvestedAt: null,
-        shippedAt: null,
-        earnedAt: null,
-        daysToGrow: 3, // default days to grow
-        isReadyForHarvest: false,
-      };
+    till: (state) => {
+      state.stage = 'till';
+      state.lastUpdated = Date.now();
+      state.plantedAt = null;
+      state.wateredAt = null;
+      state.grownAt = null;
+      state.harvestedAt = null;
+      state.shippedAt = null;
+      state.earnedAt = null;
+      state.isCompleted = false;
     },
-    
-    plantSeed: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'till') {
-        state.crops[id] = {
-          ...state.crops[id],
-          stage: 'plant',
-          plantedAt: getCurrentTimestamp(),
-        };
+    plant: (state) => {
+      if (state.stage === 'till') {
+        state.stage = 'plant';
+        state.lastUpdated = Date.now();
+        state.plantedAt = Date.now();
       }
     },
-    
-    waterCrop: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'plant') {
-        state.crops[id] = {
-          ...state.crops[id],
-          stage: 'water',
-          wateredAt: getCurrentTimestamp(),
-        };
+    water: (state) => {
+      if (state.stage === 'plant') {
+        state.stage = 'water';
+        state.lastUpdated = Date.now();
+        state.wateredAt = Date.now();
       }
     },
-    
-    sleepCycle: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'water') {
-        state.crops[id] = {
-          ...state.crops[id],
-          stage: 'sleep',
-        };
+    sleep: (state) => {
+      if (state.stage === 'water') {
+        state.stage = 'sleep';
+        state.lastUpdated = Date.now();
       }
     },
-    
-    // This will be called when day advances to trigger growth
-    advanceDay: (state, action: PayloadAction<{ day: number }>) => {
-      const { day } = action.payload;
-      state.currentDay = day;
-      
-      // Process all crops for progression based on new day
-      Object.keys(state.crops).forEach(key => {
-        state.crops[key] = shouldProgressStage(state.crops[key], day);
-        
-        // If crop is ready for harvest, mark it
-        if (state.crops[key].stage === 'grow') {
-          const now = getCurrentTimestamp();
-          if (state.crops[key].plantedAt) {
-            const daysSincePlanting = Math.floor((now - state.crops[key].plantedAt) / (24 * 60 * 60 * 1000));
-            if (daysSincePlanting >= state.crops[key].daysToGrow) {
-              state.crops[key] = {
-                ...state.crops[key],
-                stage: 'harvest',
-                isReadyForHarvest: true,
-                grownAt: now
-              };
-            }
-          }
-        }
-      });
-    },
-    
-    harvestCrop: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'harvest' && state.crops[id].isReadyForHarvest) {
-        state.crops[id] = {
-          ...state.crops[id],
-          stage: 'ship',
-          harvestedAt: getCurrentTimestamp(),
-          isReadyForHarvest: false,
-        };
+    grow: (state) => {
+      if (state.stage === 'sleep') {
+        state.stage = 'grow';
+        state.lastUpdated = Date.now();
+        state.grownAt = Date.now();
       }
     },
-    
-    shipCrop: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'ship') {
-        state.crops[id] = {
-          ...state.crops[id],
-          stage: 'earn',
-          shippedAt: getCurrentTimestamp(),
-        };
+    harvest: (state) => {
+      if (state.stage === 'grow') {
+        state.stage = 'harvest';
+        state.lastUpdated = Date.now();
+        state.harvestedAt = Date.now();
       }
     },
-    
-    earnCrop: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      if (state.crops[id] && state.crops[id].stage === 'earn') {
-        state.crops[id] = {
-          ...state.crops[id],
-          earnedAt: getCurrentTimestamp(),
-        };
+    ship: (state) => {
+      if (state.stage === 'harvest') {
+        state.stage = 'ship';
+        state.lastUpdated = Date.now();
+        state.shippedAt = Date.now();
       }
     },
-    
-    resetCrop: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
-      delete state.crops[id];
+    earn: (state) => {
+      if (state.stage === 'ship') {
+        state.stage = 'earn';
+        state.lastUpdated = Date.now();
+        state.earnedAt = Date.now();
+        state.isCompleted = true;
+      }
     },
-    
-    // Load saved state from persistent storage
-    loadSavedState: (state, action: PayloadAction<CropState>) => {
-      return { ...action.payload };
-    },
+    resetCrop: () => initialState,
   },
 });
 
-export const { 
-  tillLand, 
-  plantSeed, 
-  waterCrop, 
-  sleepCycle, 
-  advanceDay,
-  harvestCrop, 
-  shipCrop, 
-  earnCrop, 
+// Export actions
+export const {
+  till,
+  plant,
+  water,
+  sleep,
+  grow,
+  harvest,
+  ship,
+  earn,
   resetCrop,
-  loadSavedState
 } = cropSlice.actions;
 
 // Selectors
-export const selectCrops = (state: RootState) => state.crop.crops;
-export const selectCurrentDay = (state: RootState) => state.crop.currentDay;
-export const selectIsCropReadyForHarvest = (state: RootState, id: string) => {
-  return state.crop.crops[id]?.isReadyForHarvest || false;
-};
-export const selectCropStage = (state: RootState, id: string) => {
-  return state.crop.crops[id]?.stage || null;
+export const selectCropStage = (state: RootState) => state.crop.stage;
+export const selectIsCropCompleted = (state: RootState) => state.crop.isCompleted;
+export const selectCropProgress = (state: RootState) => {
+  const stages = ['till', 'plant', 'water', 'sleep', 'grow', 'harvest', 'ship', 'earn'];
+  const currentIndex = stages.indexOf(state.crop.stage);
+  return { current: state.crop.stage, index: currentIndex, total: stages.length };
 };
 
+// Export reducer
 export default cropSlice.reducer;
