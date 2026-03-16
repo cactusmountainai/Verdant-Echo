@@ -1,14 +1,13 @@
-import { StrictMode } from 'react';
-import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { store } from './state/store';
-import App from './App';
+import { BootScene } from './BootScene.ts';
+import { PreloadScene } from './PreloadScene.ts';
+import { FarmScene } from './FarmScene.ts';
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </StrictMode>
-);
+// Example usage (adjust based on actual game setup logic)
+const config = {
+  type: Phaser.AUTO,
+  width: 800,
+  height: 600,
+  scene: [BootScene, PreloadScene, FarmScene],
+};
+
+const game = new Phaser.Game(config);
