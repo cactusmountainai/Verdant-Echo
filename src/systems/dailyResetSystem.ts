@@ -2,9 +2,10 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../state/store';
 import { selectCurrentTime } from '../state/slices/timeSystemSlice';
 
-// Types
+// Define callback types
 export type DayCallback = () => void;
 
+// State interface for daily reset system
 interface DailyResetState {
   onDayStartCallbacks: DayCallback[];
   onDayEndCallbacks: DayCallback[];
@@ -18,58 +19,62 @@ const initialState: DailyResetState = {
   lastProcessedDay: null,
 };
 
-// Async thunk to check and trigger daily reset
+// Async thunk to check for day changes and trigger callbacks
 export const checkAndTriggerDailyReset = createAsyncThunk(
   'dailyReset/checkAndTrigger',
   async (_, { getState }) => {
     const state = getState() as RootState;
     const currentTime = selectCurrentTime(state);
     
-    // Convert milliseconds to day number (UTC days)
+    // Convert milliseconds to UTC days (86400000 ms in a day)
     const currentDay = Math.floor(currentTime / 86400000);
     
     return { currentDay };
   }
 );
 
-// Slice
+// Create slice
 const dailyResetSlice = createSlice({
   name: 'dailyReset',
   initialState,
   reducers: {
+    // Register onDayStart callback
     registerOnDayStartCallback: (state, action: PayloadAction<DayCallback>) => {
       if (!state.onDayStartCallbacks.includes(action.payload)) {
         state.onDayStartCallbacks.push(action.payload);
       }
     },
+    // Register onDayEnd callback
     registerOnDayEndCallback: (state, action: PayloadAction<DayCallback>) => {
       if (!state.onDayEndCallbacks.includes(action.payload)) {
         state.onDayEndCallbacks.push(action.payload);
       }
     },
-    triggerDayStart: (state) => {
-      state.onDayStartCallbacks.forEach(callback => callback());
-    },
-    triggerDayEnd: (state) => {
-      state.onDayEndCallbacks.forEach(callback => callback());
+    // Clear all callbacks (for testing or reset)
+    clearAllCallbacks: (state) => {
+      state.onDayStartCallbacks = [];
+      state.onDayEndCallbacks = [];
     },
   },
   extraReducers: (builder) => {
     builder.addCase(checkAndTriggerDailyReset.fulfilled, (state, action) => {
       const { currentDay } = action.payload;
       
-      // Only trigger if day has changed
-      if (state.lastProcessedDay !== null && state.lastProcessedDay < currentDay) {
-        // Trigger end of previous day callbacks
+      // Handle first initialization
+      if (state.lastProcessedDay === null) {
+        state.lastProcessedDay = currentDay;
+        return;
+      }
+      
+      // Check if day has changed
+      if (currentDay > state.lastProcessedDay) {
+        // Day has advanced - trigger onDayEnd for previous day
         state.onDayEndCallbacks.forEach(callback => callback());
         
-        // Trigger start of new day callbacks
+        // Trigger onDayStart for new day
         state.onDayStartCallbacks.forEach(callback => callback());
         
         // Update last processed day
-        state.lastProcessedDay = currentDay;
-      } else if (state.lastProcessedDay === null) {
-        // First time initialization - set initial day but don't trigger callbacks yet
         state.lastProcessedDay = currentDay;
       }
     });
@@ -77,14 +82,14 @@ const dailyResetSlice = createSlice({
 });
 
 // Export actions and selector
-export const {
-  registerOnDayStartCallback,
-  registerOnDayEndCallback,
-  triggerDayStart,
-  triggerDayEnd,
+export const { 
+  registerOnDayStartCallback, 
+  registerOnDayEndCallback, 
+  clearAllCallbacks 
 } = dailyResetSlice.actions;
 
 // Selectors
 export const selectDailyResetState = (state: RootState) => state.dailyReset;
 
+// Reducer
 export default dailyResetSlice.reducer;
