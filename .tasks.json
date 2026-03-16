@@ -519,12 +519,12 @@
   {
     "id": "task_48",
     "description": "Remove any instance of reducers importing or calling `store.dispatch()`; convert side effects to thunks/middleware and ensure no file in `src/state/slices/` imports from `src/state/store.ts`.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:49:35",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:53:44",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "7b1b4c96"
   },
   {
