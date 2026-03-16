@@ -1,5 +1,4 @@
-import { store } from '../state/store';
-import { updateTime } from '../state/slices/timeSystemSlice';
+import { store } from '../store';
 
 export class TimeSystem {
   private isSleeping = false;
@@ -16,23 +15,22 @@ export class TimeSystem {
 
   async sleep(): Promise<void> {
     if (this.isSleeping) return;
-
+    
     this.isSleeping = true;
 
     // Trigger onDayEnd before fade-out
-    if (this.onDayEndCallback) {
-      this.onDayEndCallback();
-    }
+    if (this.onDayEndCallback) this.onDayEndCallback();
 
     // Fade out screen
     await this.fadeOutScreen();
 
-    // Update time state
+    // Update time state: increment hour, advance day if needed
     const currentState = store.getState().timeSystem;
-    let newTime = (currentState.currentTime + 1) % 24;
+    let newTime = currentState.currentTime + 1;
     let newDay = currentState.currentDay;
 
-    if (currentState.currentTime === 23) {
+    if (newTime > 23) {
+      newTime = 0;
       newDay += 1;
     }
 
@@ -41,15 +39,13 @@ export class TimeSystem {
     // Auto-save after time update
     this.autoSave();
 
+    // Trigger onDayStart before fade-in
+    if (this.onDayStartCallback) this.onDayStartCallback();
+
     // Fade in screen
     await this.fadeInScreen();
 
-    // Trigger onDayStart after fade-in completes
-    if (this.onDayStartCallback) {
-      this.onDayStartCallback();
-    }
-
-    // Update FarmScene UI
+    // Update FarmScene UI after all transitions complete
     if (window.farmScene && typeof window.farmScene.updateUI === 'function') {
       window.farmScene.updateUI();
     }
@@ -61,27 +57,23 @@ export class TimeSystem {
     const overlay = document.getElementById('game-overlay');
     if (overlay) {
       overlay.style.opacity = '1';
-      return new Promise((resolve) => {
-        setTimeout(resolve, 500); // Match CSS transition duration
-      });
+      return new Promise(resolve => setTimeout(resolve, 500));
     }
+    return new Promise(resolve => setTimeout(resolve, 500));
   }
 
   private async fadeInScreen(): Promise<void> {
     const overlay = document.getElementById('game-overlay');
     if (overlay) {
       overlay.style.opacity = '0';
-      return new Promise((resolve) => {
-        setTimeout(resolve, 500); // Match CSS transition duration
-      });
+      return new Promise(resolve => setTimeout(resolve, 500));
     }
+    return new Promise(resolve => setTimeout(resolve, 500));
   }
 
   private autoSave(): void {
     if (window.farmScene && typeof window.farmScene.saveGame === 'function') {
       window.farmScene.saveGame();
-    } else if (typeof window.saveGame === 'function') {
-      window.saveGame();
     }
   }
 }
