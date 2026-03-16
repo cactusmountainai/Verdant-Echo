@@ -1,82 +1,85 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RootState, AppThunk } from '../state/store';
-import { timeSystemSelector } from '../state/slices/timeSystem/selectors';
+import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
+import { RootState } from '../state/store';
+import { timeSystemSelector } from '../state/timeSystemSlice';
 
-// Types
+// Define types
 export type DayCallback = () => void;
 
 interface DailyResetState {
   onDayStartCallbacks: DayCallback[];
   onDayEndCallbacks: DayCallback[];
-  lastDay: number | null;
+  lastProcessedDay: number | null;
 }
 
 // Initial state
 const initialState: DailyResetState = {
   onDayStartCallbacks: [],
   onDayEndCallbacks: [],
-  lastDay: null,
+  lastProcessedDay: null,
 };
 
-// Slice
+// Thunk to check and trigger daily reset based on time system
+export const checkAndTriggerDailyReset = createAsyncThunk(
+  'dailyReset/checkAndTrigger',
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const currentTime = timeSystemSelector(state).currentTime;
+    const currentDay = Math.floor(currentTime / 86400000); // Convert ms to days
+
+    return { currentDay, lastProcessedDay: state.dailyReset.lastProcessedDay };
+  }
+);
+
+// Slice definition
 export const dailyResetSlice = createSlice({
   name: 'dailyReset',
   initialState,
   reducers: {
-    registerOnDayStart: (state, action: PayloadAction<DayCallback>) => {
+    registerOnDayStartCallback: (state, action: PayloadAction<DayCallback>) => {
       if (!state.onDayStartCallbacks.includes(action.payload)) {
         state.onDayStartCallbacks.push(action.payload);
       }
     },
-    registerOnDayEnd: (state, action: PayloadAction<DayCallback>) => {
+    registerOnDayEndCallback: (state, action: PayloadAction<DayCallback>) => {
       if (!state.onDayEndCallbacks.includes(action.payload)) {
         state.onDayEndCallbacks.push(action.payload);
       }
     },
     triggerDayStart: (state) => {
       state.onDayStartCallbacks.forEach(callback => callback());
-      state.lastDay = new Date().getUTCDate();
     },
     triggerDayEnd: (state) => {
       state.onDayEndCallbacks.forEach(callback => callback());
-      state.lastDay = new Date().getUTCDate();
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(checkAndTriggerDailyReset.fulfilled, (state, action) => {
+      const { currentDay, lastProcessedDay } = action.payload;
+      
+      // If this is the first time or day has changed
+      if (lastProcessedDay === null || currentDay !== lastProcessedDay) {
+        // If we have a previous day, it means we've crossed midnight -> trigger day end then day start
+        if (lastProcessedDay !== null) {
+          state.onDayEndCallbacks.forEach(callback => callback());
+        }
+        
+        state.onDayStartCallbacks.forEach(callback => callback());
+        state.lastProcessedDay = currentDay;
+      }
+    });
   },
 });
 
 // Selectors
 export const selectDailyResetState = (state: RootState) => state.dailyReset;
 
-// Thunk to handle day change logic based on timeSystem
-export const checkAndTriggerDailyReset = (): AppThunk => (dispatch, getState) => {
-  const state = getState();
-  const currentTime = timeSystemSelector(state);
-  const currentDay = new Date(currentTime).getUTCDate();
-
-  if (state.dailyReset.lastDay === null) {
-    // First run - initialize
-    dispatch(dailyResetSlice.actions.triggerDayStart());
-  } else if (currentDay !== state.dailyReset.lastDay) {
-    // Day has changed
-    const wasBeforeMidnight = state.dailyReset.lastDay > currentDay;
-    
-    if (wasBeforeMidnight) {
-      // Crossed midnight: end previous day, start new day
-      dispatch(dailyResetSlice.actions.triggerDayEnd());
-      dispatch(dailyResetSlice.actions.triggerDayStart());
-    } else {
-      // Just a new day within same UTC cycle
-      dispatch(dailyResetSlice.actions.triggerDayStart());
-    }
-  }
-};
-
-// Actions and reducer exports
-export const {
-  registerOnDayStart,
-  registerOnDayEnd,
-  triggerDayStart,
-  triggerDayEnd,
+// Actions
+export const { 
+  registerOnDayStartCallback, 
+  registerOnDayEndCallback, 
+  triggerDayStart, 
+  triggerDayEnd 
 } = dailyResetSlice.actions;
 
+// Reducer
 export default dailyResetSlice.reducer;

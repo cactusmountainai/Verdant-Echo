@@ -2,12 +2,6 @@
   "iteration": 0,
   "history": [
     {
-      "iteration": 2,
-      "task": "task_30",
-      "status": "Done",
-      "timestamp": 1773623043.426481
-    },
-    {
       "iteration": 3,
       "task": "task_31",
       "status": "Done",
@@ -300,6 +294,12 @@
       "task": "task_75",
       "status": "In Progress",
       "timestamp": 1773629617.1312616
+    },
+    {
+      "iteration": 1,
+      "task": "task_75",
+      "status": "In Progress",
+      "timestamp": 1773629844.9793136
     }
   ],
   "context_brief": "",
