@@ -1,2 +1,7 @@
 export type TileState = 'untilled' | 'tilled' | 'watered' | 'planted' | 'growing' | 'harvestable' | 'dead';
-export type ToolType = 'hoe' | 'wateringCan' | 'harvestTool';
+
+export enum ToolType {
+  HOE = 'hoe',
+  WATERING_CAN = 'wateringCan',
+  HARVEST_TOOL = 'harvestTool'
+}
