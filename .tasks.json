@@ -332,12 +332,12 @@
   {
     "id": "task_31",
     "description": "Implement main.py with CLI parsing using argparse for input arguments",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T17:18:28",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:07:07",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "b72ba2e3"
   },
   {

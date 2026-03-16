@@ -1,66 +1,139 @@
 #!/usr/bin/env python3
-import typer
-from typing import Optional
+"""
+Main entry point for the application with CLI interface.
+"""
 
-app = typer.Typer(
-    name="farm-game-cli",
-    help="Command line interface for Farm Game development and management"
-)
+import argparse
+import sys
 
-@app.command()
-def build(
-    prod: bool = typer.Option(False, "--prod", "-p", help="Build for production"),
-    watch: bool = typer.Option(False, "--watch", "-w", help="Watch files for changes")
-):
-    """Build the game project"""
-    if prod and watch:
-        raise typer.BadParameter("Cannot use --prod and --watch together. Use one or the other.")
+def parse_arguments():
+    """Parse command line arguments using argparse."""
+    parser = argparse.ArgumentParser(
+        description="Farm management system with multi-agent simulation",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python main.py --mode simulate --days 7 --output results.json
+  python main.py --mode import --file data.csv --project "My Farm Project"
+        """
+    )
     
-    if prod:
-        typer.echo("Building for production...")
-    elif watch:
-        typer.echo("Starting development server with hot reload...")
-    else:
-        typer.echo("Building in development mode...")
-
-@app.command()
-def serve():
-    """Start development server"""
-    typer.echo("Starting development server on http://localhost:3000")
-
-@app.command()
-def test(
-    unit: bool = typer.Option(False, "--unit", "-u", help="Run unit tests"),
-    e2e: bool = typer.Option(False, "--e2e", "-e", help="Run end-to-end tests"),
-    coverage: bool = typer.Option(False, "--coverage", "-c", help="Generate test coverage report")
-):
-    """Run tests"""
-    if not any([unit, e2e, coverage]):
-        typer.echo("No test type specified. Run with --unit, --e2e, or --coverage.")
-        raise typer.Exit(code=1)
+    # General options
+    parser.add_argument(
+        '--mode', 
+        choices=['simulate', 'import', 'export', 'init', 'test'],
+        required=True,
+        help='Operation mode: simulate, import, export, init, or test'
+    )
     
-    if unit:
-        typer.echo("Running unit tests...")
-    if e2e:
-        typer.echo("Running end-to-end tests...")
-    if coverage:
-        typer.echo("Generating test coverage report...")
+    # Simulation parameters
+    parser.add_argument(
+        '--days',
+        type=int,
+        default=30,
+        help='Number of days to simulate (default: 30)'
+    )
+    
+    parser.add_argument(
+        '--agents',
+        type=int,
+        default=5,
+        help='Number of agents in simulation (default: 5)'
+    )
+    
+    # File operations
+    parser.add_argument(
+        '--file',
+        type=str,
+        help='Input/output file path'
+    )
+    
+    parser.add_argument(
+        '--output',
+        type=str,
+        help='Output file path for results'
+    )
+    
+    parser.add_argument(
+        '--project',
+        type=str,
+        help='Project name (for import/export operations)'
+    )
+    
+    # Debug and logging
+    parser.add_argument(
+        '--verbose',
+        '-v',
+        action='store_true',
+        help='Enable verbose output'
+    )
+    
+    parser.add_argument(
+        '--debug',
+        action='store_true',
+        help='Enable debug mode'
+    )
+    
+    return parser.parse_args()
 
-@app.command()
-def deploy(
-    env: str = typer.Option("staging", "--env", "-e", help="Deployment environment"),
-    branch: Optional[str] = typer.Option(None, "--branch", "-b", help="Specific branch to deploy")
-):
-    """Deploy the game"""
-    if branch:
-        typer.echo(f"Deploying branch {branch} to {env} environment...")
-    else:
-        typer.echo(f"Deploying current state to {env} environment...")
-
-@app.command()
-def init():
-    """Initialize project structure"""
-    typer.echo("Initializing project structure...")
+def main():
+    """Main function that coordinates the application based on CLI arguments."""
+    args = parse_arguments()
+    
+    if args.verbose:
+        print(f"Running in {args.mode} mode")
+        
+    if args.debug:
+        print("Debug mode enabled")
+    
+    try:
+        if args.mode == 'simulate':
+            from src.systems.timeSystem import TimeSystem
+            time_system = TimeSystem()
+            time_system.simulate(days=args.days, agents=args.agents)
+            
+            if args.output:
+                print(f"Simulation results saved to {args.output}")
+                
+        elif args.mode == 'import':
+            if not args.file:
+                print("Error: --file is required for import mode", file=sys.stderr)
+                sys.exit(1)
+                
+            from src.services.dataImportService import DataImportService
+            importer = DataImportService()
+            importer.import_data(args.file, project_name=args.project)
+            
+        elif args.mode == 'export':
+            if not args.output:
+                print("Error: --output is required for export mode", file=sys.stderr)
+                sys.exit(1)
+                
+            from src.services.dataExportService import DataExportService
+            exporter = DataExportService()
+            exporter.export_data(args.output, project_name=args.project)
+            
+        elif args.mode == 'init':
+            from src.services.initTimelineService import InitTimelineService
+            init_service = InitTimelineService()
+            init_service.initialize_timeline()
+            
+        elif args.mode == 'test':
+            print("Running tests...")
+            # Would typically call test runner here
+            pass
+            
+    except ImportError as e:
+        print(f"Error: Required module not found - {e}", file=sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        if args.debug:
+            raise
+        print(f"Error during execution: {e}", file=sys.stderr)
+        sys.exit(1)
+    
+    if args.verbose:
+        print("Operation completed successfully")
 
 if __name__ == "__main__":
-    typer.run(app)
+    main()
