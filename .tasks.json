@@ -563,12 +563,12 @@
   {
     "id": "task_52",
     "description": "Add a `npm run type-check` script to `package.json` if missing, and ensure it passes with zero errors or warnings across the project.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:49:35",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:59:10",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "ff25712b"
   },
   {
