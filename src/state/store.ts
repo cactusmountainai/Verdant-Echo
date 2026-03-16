@@ -14,6 +14,7 @@ import timeSystemReducer from './slices/timeSystemSlice';
 import projectTimelineReducer from './slices/projectTimelineSlice';
 import farmSceneReducer from './slices/farmSceneSlice';
 import cropReducer from './slices/cropSlice';
+import { combineReducers } from '@reduxjs/toolkit';
 
 const persistConfig = {
   key: 'root',

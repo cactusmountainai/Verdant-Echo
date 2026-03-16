@@ -1,46 +1,33 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { RootState } from '../types';
+import type { RootState } from '../store';
 
 interface FarmSceneState {
-  sceneLoaded: boolean;
-  cameraPosition: { x: number; y: number; z: number };
-  selectedObject: string | null;
-  isEditing: boolean;
+  sceneType: 'tilled' | 'planted' | 'watered' | 'growing' | 'harvestReady' | 'cleared';
+  weather: 'sunny' | 'rainy' | 'cloudy' | 'stormy';
+  temperature: number; // Celsius
 }
 
 const initialState: FarmSceneState = {
-  sceneLoaded: false,
-  cameraPosition: { x: 0, y: 0, z: 10 },
-  selectedObject: null,
-  isEditing: false
+  sceneType: 'tilled',
+  weather: 'sunny',
+  temperature: 20,
 };
 
 export const farmSceneSlice = createSlice({
   name: 'farmScene',
   initialState,
   reducers: {
-    setSceneLoaded: (state, action: PayloadAction<boolean>) => {
-      state.sceneLoaded = action.payload;
+    updateScene: (state, action: PayloadAction<Partial<FarmSceneState>>) => {
+      return { ...state, ...action.payload };
     },
-    updateCameraPosition: (state, action: PayloadAction<{ x: number; y: number; z: number }>) => {
-      state.cameraPosition = action.payload;
-    },
-    selectObject: (state, action: PayloadAction<string | null>) => {
-      state.selectedObject = action.payload;
-    },
-    toggleEditing: (state) => {
-      state.isEditing = !state.isEditing;
-    }
-  }
+    
+    reset: () => initialState,
+  },
 });
 
-export const { setSceneLoaded, updateCameraPosition, selectObject, toggleEditing } = farmSceneSlice.actions;
+export const { updateScene, reset } = farmSceneSlice.actions;
+
+export default farmSceneSlice.reducer;
 
 // Selectors
 export const selectFarmScene = (state: RootState) => state.farmScene;
-export const selectSceneLoaded = (state: RootState) => state.farmScene.sceneLoaded;
-export const selectCameraPosition = (state: RootState) => state.farmScene.cameraPosition;
-export const selectSelectedObject = (state: RootState) => state.farmScene.selectedObject;
-export const selectIsEditing = (state: RootState) => state.farmScene.isEditing;
-
-export default farmSceneSlice.reducer;
