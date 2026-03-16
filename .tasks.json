@@ -442,12 +442,12 @@
   {
     "id": "task_41",
     "description": "Add selector factory functions in `src/state/slices/` for common state access (e.g., `selectCrops`, `selectDay`) and verify all return types are explicit.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:27:13",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:36:54",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "ecdc6381"
   },
   {
