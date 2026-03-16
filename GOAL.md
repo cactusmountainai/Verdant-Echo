@@ -1,72 +1,41 @@
-# FarmSim Project Scope Document
+# Project Scope and Deliverables
 
-## Project Overview
-FarmSim is a multiplayer farming simulation game where players manage their own farms while interacting with autonomous agent systems (weather, animals, crops) in a shared world. The game combines real-time mechanics with persistent storage for long-term progression.
+## Objective
+Develop a multi-agent simulation system for agricultural management, enabling stakeholders to model, monitor, and optimize farm operations through an interactive web-based interface.
 
-## Core Features
+## Stakeholder Requirements
+- Real-time simulation of farm agents (crops, animals, equipment, workers)
+- Persistent storage of project states and historical data
+- Import/export of farm configuration and historical data
+- Modular architecture supporting future expansion
+- Responsive UI with visual farm scene representation
 
-### 1. Multi-Agent System
-- Weather system that dynamically affects crop growth and resource availability
-- Animal behavior agents (chickens, cows, sheep) with feeding, breeding, and production cycles
-- Crop growth systems with stages from planting to harvest
-- NPC trader agents for buying/selling resources
-- Day/night cycle affecting player activity and agent behaviors
+## Deliverables
 
-### 2. Player Management System
-- Character creation and customization
-- Inventory management (tools, seeds, harvested goods)
-- Farm expansion mechanics (land purchase, building construction)
-- Skill progression system (farming, animal care, crafting)
+### 1. Core Simulation System
+- Multi-agent framework (`multi_agent.py`) to manage autonomous agents (crops, livestock, machinery)
+- Time progression system (`timeSystem.js`) driving simulation ticks and events
+- Farm scene visualization (`FarmScene.ts`, `src/scenes/FarmScene.ts`) rendering agent states
 
-### 3. Persistent World State
-- Save/load functionality using IndexedDB via Dexie.js
-- Global world state tracking (seasons, market prices, event timers)
-- Player-specific data storage with schema validation
-- Automatic backup and versioning of save files
+### 2. Data Management
+- Local persistent storage via Dexie.js (`src/storage/dexie.ts`, `src/lib/dexie.ts`)
+- Save/Load service for project state (`src/storage/saveService.ts`)
+- Data import/export services (`src/services/dataImportService.ts`, `src/services/dataIngestionService.ts`)
 
-### 4. Game Scenes & UI
-- BootScene: Initialization, loading screens, permission handling
-- PreloadScene: Asset loading, resource caching, connection establishment
-- FarmScene: Main gameplay interface with interactive farm elements
-- HUD overlay showing inventory, time, weather, and player stats
+### 3. Application Infrastructure
+- Main application module with dependency injection (`src/app.module.ts`)
+- Entry point and Vite configuration (`src/main.ts`, `vite.config.ts`)
+- State management store (`store.ts`) for reactive UI updates
+- Domain models for Project and User entities (`src/models/Project.ts`, `src/models/User.ts`)
 
-## Technical Architecture
-- Phaser 3 game engine for rendering and physics
-- TypeScript for type safety across client-side codebase
-- Redux-style state management with slices (player, world, meta)
-- Dexie.js as IndexedDB wrapper for local persistence
-- Vite build system for optimized development workflow
+### 4. Configuration & Setup
+- Centralized config loader (`src/config/loader.ts`) managing environment-specific settings
+- Unified model exports (`src/models/index.ts`)
+- TypeScript-based structure ensuring type safety across modules
 
-## Success Metrics
-
-### Performance
-- [ ] Game loads in under 2 seconds on mid-range devices
-- [ ] Maintains 60 FPS during peak activity with 5+ agents active
-- [ ] Save/load operations complete within 500ms for 10KB data
-
-### Functionality
-- [ ] Weather system accurately affects crop growth rates (±10% variance)
-- [ ] Animal agents follow defined behavior trees with <5% error rate
-- [ ] Player inventory persists across sessions with 100% data integrity
-- [ ] All game states correctly serialize/deserialize via Dexie schemas
-
-### User Experience
-- [ ] 90% of test users can complete first harvest within 15 minutes
-- [ ] <5% error rate on save operations during gameplay
-- [ ] Intuitive UI with clear visual feedback for all interactions
-
-## Milestones
-1. Week 1: Implement BootScene and PreloadScene with asset loading
-2. Week 2: Develop FarmScene with basic player movement and interaction
-3. Week 3: Build time system with day/night cycle and weather effects
-4. Week 4: Integrate Dexie persistence for player/world state
-5. Week 5: Implement multi-agent systems (animals, crops)
-6. Week 6: Polish UI/UX and conduct playtesting
-7. Week 7: Final testing, bug fixes, and documentation
-
-## Dependencies
-- Phaser 3.80+ for game rendering
-- Redux Toolkit for state management
-- Dexie.js v4+ for IndexedDB operations
-- Vite 5+ for build toolchain
-- TypeScript 5.x for type safety
+## Success Criteria
+- User can create, save, and load a farm project with agents
+- Time system advances simulation consistently and triggers agent behaviors
+- Data import/export functions correctly between JSON formats
+- UI renders farm scene with responsive agent visuals
+- All components integrate seamlessly via dependency injection and state store
