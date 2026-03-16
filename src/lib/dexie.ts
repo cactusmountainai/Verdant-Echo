@@ -1,25 +1,48 @@
-import { Dexie } from 'dexie';
+import Dexie from 'dexie';
 
-export const db = new Dexie('FarmGame');
+interface Project {
+  id?: number;
+  name: string;
+  startDate: number; // timestamp
+  endDate: number | null;
+  status: 'active' | 'completed' | 'paused';
+}
 
-db.version(1).stores({
-  saves: '++id, saveSlot',
-  saveData: 'saveSlot', // primary key is saveSlot (1, 2, or 3)
-  settings: '++id',
-  unlocks: '++id',
-  achievements: '++id'
-});
+interface Meeting {
+  id?: number;
+  projectId: number;
+  title: string;
+  time: number; // timestamp
+  notes: string;
+}
 
-export const SaveDataService = {
-  async get(saveSlot: number) {
-    return db.saveData.get(saveSlot);
-  },
+class AppDatabase extends Dexie {
+  projects!: Dexie.Table<Project, number>;
+  meetings!: Dexie.Table<Meeting, number>;
 
-  async put(saveSlot: number, data: { time: unknown; inventory: Record<string, number> }) {
-    await db.saveData.put({ saveSlot, ...data });
-  },
-
-  async delete(saveSlot: number) {
-    await db.saveData.delete(saveSlot);
+  constructor() {
+    super('FarmDB');
+    this.version(1).stores({
+      projects: '++id, name, status',
+      meetings: '++id, projectId, time',
+    });
   }
-};
+}
+
+export const db = new AppDatabase();
+
+export async function addProject(project: Omit<Project, 'id'>): Promise<number> {
+  return await db.projects.add(project);
+}
+
+export async function getProjects(): Promise<Project[]> {
+  return await db.projects.toArray();
+}
+
+export async function addMeeting(meeting: Omit<Meeting, 'id'>): Promise<number> {
+  return await db.meetings.add(meeting);
+}
+
+export async function getMeetingsByProject(projectId: number): Promise<Meeting[]> {
+  return await db.meetings.where('projectId').equals(projectId).toArray();
+}

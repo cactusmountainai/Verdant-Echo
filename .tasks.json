@@ -504,5 +504,115 @@
     "review_feedback": "",
     "attempt_count": 1,
     "hash": "5845a105"
+  },
+  {
+    "id": "task_47",
+    "description": "Run `npm run build` and fix all TypeScript compilation errors in `src/state/slices/`, `src/scenes/*.ts`, and `src/lib/dexie.ts`; eliminate implicit `any` types and add explicit return types everywhere.",
+    "status": "Done",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "2026-03-15T18:52:09",
+    "review_feedback": "",
+    "attempt_count": 1,
+    "hash": "eca8377c"
+  },
+  {
+    "id": "task_48",
+    "description": "Remove any instance of reducers importing or calling `store.dispatch()`; convert side effects to thunks/middleware and ensure no file in `src/state/slices/` imports from `src/state/store.ts`.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "7b1b4c96"
+  },
+  {
+    "id": "task_49",
+    "description": "Standardize all scene classes (`BootScene`, `PreloadScene`, `FarmScene`) to use named exports (`export class ...`) and update all imports in `src/main.ts` accordingly.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "b98436fb"
+  },
+  {
+    "id": "task_50",
+    "description": "Verify Phaser game config registers scenes in correct order (Boot \u2192 Preload \u2192 Farm) and test that the game boots without errors into FarmScene.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "8b4c1981"
+  },
+  {
+    "id": "task_51",
+    "description": "Refactor `src/state/store.ts` to compose slices using dedicated slice files, ensuring RootState type accurately includes all slice states and no `as any` casts are used.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "a482d89a"
+  },
+  {
+    "id": "task_52",
+    "description": "Add a `npm run type-check` script to `package.json` if missing, and ensure it passes with zero errors or warnings across the project.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "ff25712b"
+  },
+  {
+    "id": "task_53",
+    "description": "Audit and resolve all import/type issues for `pako`, `dexie`, and `phaser` by adding minimal `.d.ts` declaration files only as last resort, with explanatory comments.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "576c0c75"
+  },
+  {
+    "id": "task_54",
+    "description": "Confirm that `tsconfig.json` has `\"strict\": true` enabled and no type-checking flags are disabled.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "5ad709e9"
+  },
+  {
+    "id": "task_55",
+    "description": "Run all existing unit/e2e tests after refactors to verify app behavior remains unchanged (no regressions in state or scene flow).",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "79f80e2d"
+  },
+  {
+    "id": "task_56",
+    "description": "Validate that `npm run build` exits with code 0 and VS Code shows zero red squiggles across the entire project before marking sprint done.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:49:35",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "d6d9fffe"
   }
 ]
