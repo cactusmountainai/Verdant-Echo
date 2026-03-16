@@ -1,14 +1,20 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
-import App from './App';
-import store from './state/store';
-import './index.css';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { MeetingService } from './services/meetingService';
+import { Inject } from '@nestjs/common';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-);
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  
+  // Enable CORS for frontend communication if needed
+  app.enableCors();
+  
+  await app.listen(3000);
+  
+  // Schedule the sprint review meeting on startup as a one-time action
+  const meetingService = app.get(MeetingService);
+  console.log('Scheduling sprint review meeting...');
+  console.log(meetingService.scheduleSprintReview());
+}
+
+bootstrap();
