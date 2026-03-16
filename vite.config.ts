@@ -1,11 +1,9 @@
-// Fix Vite configuration for proper TypeScript and asset handling
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
   resolve: {
     alias: {
       '@': '/src',
@@ -13,24 +11,10 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: true,
-    hmr: {
-      overlay: false, // Disable HMR overlay for production
-    },
+    open: true,
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-        },
-      },
-    },
-    assetsInlineLimit: 4096, // Inline smaller assets
   },
-  optimizeDeps: {
-    include: ['react', 'react-dom'],
-  },
-})
+});

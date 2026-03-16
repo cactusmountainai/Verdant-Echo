@@ -1,29 +1,43 @@
-# Fix timeline calculation and add validation
-from datetime import datetime, timedelta
-from typing import List, Optional
+from dataclasses import dataclass
+from datetime import datetime
+from typing import List, Dict, Any
 
+@dataclass
+class TimelineEvent:
+    id: str
+    title: str
+    description: str
+    date: datetime
+    category: str
+    related_items: List[str]
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'date': self.date.isoformat(),
+            'category': self.category,
+            'related_items': self.related_items
+        }
+
+@dataclass
 class ProjectTimeline:
-    def __init__(self):
-        self.events = []  # List of (datetime, event_type, description)
+    events: List[TimelineEvent]
     
-    def add_event(self, date: datetime, event_type: str, description: str):
-        """Add event with validation"""
-        if not isinstance(date, datetime):
-            raise TypeError("Date must be a datetime object")
+    def add_event(self, event: TimelineEvent) -> None:
+        """Add an event to the timeline"""
+        self.events.append(event)
         
-        if not event_type or not isinstance(event_type, str):
-            raise ValueError("Event type must be a non-empty string")
-            
-        if not description or not isinstance(description, str):
-            raise ValueError("Description must be a non-empty string")
-        
-        # Ensure events are added in chronological order
-        if self.events and date < self.events[-1][0]:
-            raise ValueError("Events must be added in chronological order")
-        
-        self.events.append((date, event_type, description))
+    def get_events_by_date(self, date: datetime) -> List[TimelineEvent]:
+        """Get all events for a specific date"""
+        return [event for event in self.events if event.date.date() == date.date()]
     
-    def get_events_in_range(self, start_date: datetime, end_date: datetime) -> List:
-        """Get events within a date range"""
+    def get_upcoming_events(self, days_ahead: int = 7) -> List[TimelineEvent]:
+        """Get events within the next N days"""
+        from datetime import timedelta
+        today = datetime.now().date()
+        end_date = today + timedelta(days=days_ahead)
+        
         return [event for event in self.events 
-                if start_date <= event[0] <= end_date]
+                if today <= event.date.date() <= end_date]

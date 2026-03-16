@@ -1,28 +1,50 @@
-# Fix data ingestion error handling and memory management
-import logging
-from typing import Generator
+from typing import Dict, Any, List, Optional
+import csv
+import json
+from datetime import datetime
 
-class DataIngestor:
-    def __init__(self):
-        self.logger = logging.getLogger(__name__)
+class DataIngestion:
+    """Handle data ingestion from various sources"""
     
-    def ingest_data(self, source: str) -> Generator[dict, None, None]:
-        """Ingest data with proper resource cleanup"""
-        try:
-            # Simulate data ingestion
-            for i, record in enumerate(self._read_source(source)):
-                if i % 1000 == 0:  # Log progress every 1000 records
-                    self.logger.info(f"Ingested {i} records from {source}")
-                
-                yield record
-                
-        except Exception as e:
-            self.logger.error(f"Error ingesting data from {source}: {e}")
-            raise
+    @staticmethod
+    def ingest_csv(file_path: str) -> List[Dict[str, Any]]:
+        """Ingest data from CSV file"""
+        data = []
+        with open(file_path, 'r', newline='', encoding='utf-8') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                # Convert string dates to datetime objects if applicable
+                for key, value in row.items():
+                    if 'date' in key.lower() or 'time' in key.lower():
+                        try:
+                            row[key] = datetime.fromisoformat(value)
+                        except (ValueError, TypeError):
+                            pass  # Keep as string if not a valid date
+                data.append(row)
+        return data
     
-    def _read_source(self, source: str) -> Generator[dict, None, None]:
-        """Simulated data reader - replace with actual implementation"""
-        # This is a placeholder - implement actual data reading logic
-        # For now, just yield dummy data to prevent infinite loops
-        for i in range(10):  # Limit to avoid infinite loop during testing
-            yield {"id": i, "source": source}
+    @staticmethod
+    def ingest_json(file_path: str) -> Any:
+        """Ingest data from JSON file"""
+        with open(file_path, 'r', encoding='utf-8') as file:
+            return json.load(file)
+    
+    @staticmethod
+    def validate_data(data: List[Dict[str, Any]], schema: Dict[str, Any]) -> bool:
+        """
+        Validate data against a schema
+        
+        Args:
+            data: List of records to validate
+            schema: Dictionary defining required fields and types
+            
+        Returns:
+            Boolean indicating if validation passed
+        """
+        for record in data:
+            for field, field_type in schema.items():
+                if field not in record:
+                    return False
+                if not isinstance(record[field], field_type):
+                    return False
+        return True

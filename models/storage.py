@@ -1,40 +1,32 @@
-# Fix file path handling and add proper error checking
-import os
-from pathlib import Path
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
 
-class StorageManager:
-    def __init__(self, base_path: str = "./data"):
-        self.base_path = Path(base_path).resolve()
-        
-        # Create base directory if it doesn't exist
-        try:
-            self.base_path.mkdir(parents=True, exist_ok=True)
-        except Exception as e:
-            raise RuntimeError(f"Cannot create storage directory {base_path}: {e}")
+@dataclass
+class StorageItem:
+    id: str
+    name: str
+    category: str
+    quantity: int
+    unit: str
+    location: str
+    last_updated: Optional[str] = None
     
-    def save_file(self, filename: str, content: bytes) -> bool:
-        """Save file with proper path validation"""
-        # Prevent directory traversal attacks
-        if '..' in filename or filename.startswith('/'):
-            raise ValueError("Invalid filename")
-        
-        filepath = self.base_path / filename
-        
-        try:
-            # Ensure parent directory exists
-            filepath.parent.mkdir(parents=True, exist_ok=True)
-            
-            # Write file
-            with open(filepath, 'wb') as f:
-                f.write(content)
+    def update_quantity(self, change: int) -> bool:
+        """Update quantity and return True if successful"""
+        new_quantity = self.quantity + change
+        if new_quantity >= 0:
+            self.quantity = new_quantity
             return True
-            
-        except Exception as e:
-            print(f"Error saving file {filename}: {e}")
-            return False
+        return False
+
+@dataclass
+class Storage:
+    items: Dict[str, StorageItem]
     
-    def get_file_path(self, filename: str) -> Path:
-        """Get safe path for a file"""
-        if '..' in filename or filename.startswith('/'):
-            raise ValueError("Invalid filename")
-        return self.base_path / filename
+    def add_item(self, item: StorageItem) -> None:
+        """Add a storage item"""
+        self.items[item.id] = item
+    
+    def get_item(self, item_id: str) -> Optional[StorageItem]:
+        """Get a storage item by ID"""
+        return self.items.get(item_id)

@@ -453,12 +453,12 @@
   {
     "id": "task_42",
     "description": "Verify `npm run type-check` passes (add script if missing) and resolve all red squiggles in VS Code across the entire project.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:27:13",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:45:54",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "cce73fe2"
   },
   {

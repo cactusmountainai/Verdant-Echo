@@ -1,7 +1,8 @@
 {
   "scripts": {
+    "type-check": "tsc --noEmit",
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   }
 }

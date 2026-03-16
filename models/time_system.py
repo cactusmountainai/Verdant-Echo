@@ -1,28 +1,42 @@
-# Fix time synchronization and drift issues
-import time
-from datetime import datetime, timedelta
+from typing import Dict, Any, Optional
+from datetime import datetime
 
 class TimeSystem:
-    def __init__(self):
-        self.start_time = datetime.now()
-        self.time_scale = 1.0  # Real-time scale (1.0 = real time)
-        self.last_update = time.time()
+    """Manages simulated time in the application"""
     
-    def get_current_time(self) -> datetime:
-        """Get current simulated time with drift compensation"""
-        now = time.time()
-        elapsed_seconds = (now - self.last_update) * self.time_scale
-        self.last_update = now
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        self.config = {
+            'speed': 1.0,           # Real-time speed multiplier
+            'start_time': 0,        # Start time in seconds
+            'time_unit': 'seconds', # Time unit for calculations
+            **(config or {})
+        }
         
-        return self.start_time + timedelta(seconds=elapsed_seconds)
+        self.current_time = self.config['start_time']
+        self.last_update = datetime.now()
     
-    def set_time_scale(self, scale: float):
-        """Set time scale with validation"""
-        if scale < 0:
-            raise ValueError("Time scale cannot be negative")
-        self.time_scale = scale
+    def update(self, delta_seconds: float) -> None:
+        """Update the current time based on elapsed real-time"""
+        now = datetime.now()
+        elapsed_real_time = (now - self.last_update).total_seconds()
+        
+        # Apply speed multiplier to get simulated time progression
+        self.current_time += elapsed_real_time * self.config['speed']
+        self.last_update = now
     
-    def reset(self):
-        """Reset time system"""
-        self.start_time = datetime.now()
-        self.last_update = time.time()
+    def get_current_time(self) -> float:
+        """Get the current simulated time"""
+        return self.current_time
+    
+    def set_time(self, new_time: float) -> None:
+        """Set the current time directly"""
+        self.current_time = max(0, new_time)
+    
+    def get_formatted_time(self) -> str:
+        """Return formatted time string (HH:MM:SS)"""
+        total_seconds = int(self.current_time)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
+        
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"

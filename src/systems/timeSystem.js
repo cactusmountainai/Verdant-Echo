@@ -1,46 +1,24 @@
+/**
+ * @typedef {Object} TimeConfig
+ * @property {number} [speed=1] - Speed multiplier for time progression
+ * @property {number} [currentTime=0] - Current simulated time in seconds
+ */
+
+/**
+ * Time System class for managing game time
+ */
 class TimeSystem {
-    constructor() {
-        this.startTime = Date.now();
-        this.timeScale = 1.0;
-        this.lastUpdate = performance.now();
-        this.isPaused = false;
-    }
+  /**
+   * @param {TimeConfig} config
+   */
+  constructor(config = {}) {
+    this.speed = config.speed || 1;
+    this.currentTime = config.currentTime || 0;
+  }
 
-    getCurrentTime() {
-        const now = performance.now();
-        
-        if (this.isPaused) {
-            // When paused, time doesn't advance
-            return new Date(this.startTime);
-        }
-        
-        const elapsedSeconds = ((now - this.lastUpdate) / 1000) * this.timeScale;
-        this.lastUpdate = now;
-        
-        return new Date(this.startTime + (elapsedSeconds * 1000));
-    }
-
-    setTimeScale(scale) {
-        if (scale < 0) {
-            throw new Error("Time scale cannot be negative");
-        }
-        this.timeScale = scale;
-    }
-
-    pause() {
-        this.isPaused = true;
-    }
-
-    resume() {
-        this.isPaused = false;
-        this.lastUpdate = performance.now();
-    }
-
-    reset() {
-        this.startTime = Date.now();
-        this.lastUpdate = performance.now();
-        this.isPaused = false;
-    }
+  update(deltaTime) {
+    this.currentTime += deltaTime * this.speed;
+  }
 }
 
 export default TimeSystem;
