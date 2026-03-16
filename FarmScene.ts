@@ -1,16 +1,8 @@
-import { Scene } from 'phaser';
+import * as THREE from 'three'
 
-export class FarmScene extends Scene {
-    constructor() {
-        super('FarmScene');
-    }
-
-    preload(): void {
-        // Load assets here if needed
-    }
-
-    create(): void {
-        // Initialize farm scene
-        console.log('FarmScene created successfully');
-    }
+export class FarmScene extends THREE.Scene {
+  constructor() {
+    super()
+    this.background = new THREE.Color(0x87ceeb)
+  }
 }

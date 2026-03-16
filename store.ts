@@ -1,11 +1,11 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 interface GameState {
-  currentScene: string;
-  isGameLoaded: boolean;
+  time: number
+  setTime: (time: number) => void
 }
 
-export const useStore = create<GameState>((set) => ({
-  currentScene: '',
-  isGameLoaded: false,
-}));
+export const useGameStore = create<GameState>((set) => ({
+  time: 0,
+  setTime: (time) => set({ time }),
+}))

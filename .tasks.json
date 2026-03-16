@@ -607,12 +607,12 @@
   {
     "id": "task_56",
     "description": "Validate that `npm run build` exits with code 0 and VS Code shows zero red squiggles across the entire project before marking sprint done.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:49:35",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:05:22",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "d6d9fffe"
   }
 ]

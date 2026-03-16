@@ -1,17 +1,16 @@
-import { Scene } from 'phaser';
+import * as THREE from 'three'
 
-export class PreloadScene extends Scene {
-    constructor() {
-        super('PreloadScene');
-    }
+export class PreloadScene {
+  private scene: THREE.Scene
+  private camera: THREE.PerspectiveCamera
 
-    preload(): void {
-        // Load assets here
-        this.load.image('logo', 'assets/logo.png'); // Example asset
-    }
-
-    create(): void {
-        // Start the Farm scene after preloading
-        this.scene.start('FarmScene');
-    }
+  constructor() {
+    this.scene = new THREE.Scene()
+    
+    // Safely get window dimensions with fallbacks for server-side rendering or undefined context
+    const width = typeof window !== 'undefined' ? window.innerWidth : 800
+    const height = typeof window !== 'undefined' ? window.innerHeight : 600
+    
+    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000)
+  }
 }
