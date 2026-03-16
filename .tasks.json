@@ -299,12 +299,12 @@
   {
     "id": "task_28",
     "description": "Create a project timeline with milestones using Monday.com or Jira",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T17:18:28",
-    "updated_at": "",
+    "updated_at": "2026-03-15T17:53:54",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "83c53501"
   },
   {

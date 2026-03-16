@@ -1,20 +1,14 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { MeetingService } from './services/meetingService';
-import { Inject } from '@nestjs/common';
+import { createApp } from 'vue';
+import App from './app.module.vue';
+import { projectTimelineService } from './services/projectTimelineService';
+import { initializeTimelineService } from './services/initTimelineService';
 
+// Initialize timeline service before app creation (awaited)
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  await initializeTimelineService();
   
-  // Enable CORS for frontend communication if needed
-  app.enableCors();
-  
-  await app.listen(3000);
-  
-  // Schedule the sprint review meeting on startup as a one-time action
-  const meetingService = app.get(MeetingService);
-  console.log('Scheduling sprint review meeting...');
-  console.log(meetingService.scheduleSprintReview());
+  const app = createApp(App);
+  app.mount('#app');
 }
 
 bootstrap();
