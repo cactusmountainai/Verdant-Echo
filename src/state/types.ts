@@ -1,18 +1,9 @@
-export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import type { RootState as ReduxRootState } from './store'; // Import RootState from actual store setup
 
-export interface WorldState {
-  time: number; // total minutes elapsed since game start
-  hour: number; // 0–23
-  day: number;  // 1+
-  season: Season;
-}
+// Export inferred RootState from the real Redux store configuration
+export type RootState = ReduxRootState;
 
-export interface PlayerState {
-  isAsleep: boolean;
-  // ... other player fields ...
-}
-
-export interface GameState {
-  world: WorldState;
-  player: PlayerState;
-}
+// Typed hooks for consistent usage across app
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+export const useAppDispatch = () => useDispatch();
