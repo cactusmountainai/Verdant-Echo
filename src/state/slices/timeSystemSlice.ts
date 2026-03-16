@@ -1,33 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TimeSystemState } from '../../systems/timeSystem';
 
 const initialState: TimeSystemState = {
   currentTime: 0,
+  speed: 1,
   isPaused: false,
-  speedMultiplier: 1,
   day: 1,
-  season: 'spring',
+  hour: 6,
 };
 
 export const timeSystemSlice = createSlice({
   name: 'timeSystem',
   initialState,
   reducers: {
-    updateTime: (state, action) => {
-      state.currentTime += action.payload;
+    updateTime: (state, action: PayloadAction<number>) => {
+      state.currentTime = action.payload;
     },
     togglePause: (state) => {
       state.isPaused = !state.isPaused;
     },
-    setSpeedMultiplier: (state, action) => {
-      state.speedMultiplier = action.payload;
+    setSpeed: (state, action: PayloadAction<number>) => {
+      state.speed = action.payload;
     },
     advanceDay: (state) => {
       state.day += 1;
-      // Logic for season changes could go here
+      state.hour = 6; // Reset to morning
     },
   },
 });
 
-export const { updateTime, togglePause, setSpeedMultiplier, advanceDay } = timeSystemSlice.actions;
+export const { updateTime, togglePause, setSpeed, advanceDay } = timeSystemSlice.actions;
 export default timeSystemSlice.reducer;

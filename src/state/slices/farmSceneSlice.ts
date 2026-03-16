@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FarmSceneState } from '../../FarmScene';
 
 const initialState: FarmSceneState = {
@@ -16,30 +16,18 @@ export const farmSceneSlice = createSlice({
   name: 'farmScene',
   initialState,
   reducers: {
-    addCrop: (state, action) => {
+    addCrop: (state, action: PayloadAction<any>) => {
       state.crops.push(action.payload);
     },
-    removeCrop: (state, action) => {
-      state.crops = state.crops.filter(crop => crop.id !== action.payload);
+    removeCrop: (state, action: PayloadAction<number>) => {
+      state.crops = state.crops.filter((_, index) => index !== action.payload);
     },
-    updateCropGrowth: (state, action) => {
-      const crop = state.crops.find(c => c.id === action.payload.id);
-      if (crop) {
-        crop.growthStage = action.payload.growthStage;
-      }
-    },
-    addAnimal: (state, action) => {
-      state.animals.push(action.payload);
-    },
-    updateResource: (state, action) => {
+    updateResource: (state, action: PayloadAction<{ resource: keyof typeof initialState.resources; amount: number }>) => {
       const { resource, amount } = action.payload;
-      // Use keyof to ensure type safety without casting
-      if (resource in state.resources) {
-        state.resources[resource] += amount;
-      }
+      state.resources[resource] += amount;
     },
   },
 });
 
-export const { addCrop, removeCrop, updateCropGrowth, addAnimal, updateResource } = farmSceneSlice.actions;
+export const { addCrop, removeCrop, updateResource } = farmSceneSlice.actions;
 export default farmSceneSlice.reducer;

@@ -552,12 +552,12 @@
   {
     "id": "task_51",
     "description": "Refactor `src/state/store.ts` to compose slices using dedicated slice files, ensuring RootState type accurately includes all slice states and no `as any` casts are used.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:49:35",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:58:14",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "a482d89a"
   },
   {
