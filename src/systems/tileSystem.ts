@@ -1,64 +1,51 @@
 import { updateTile } from '../state/slices/farmSlice';
 import { TileState, ToolType } from '../types/farm';
 
-// Define valid transitions per tool
-const validTransitions = new Map<ToolType, Set<TileState>>([
-  [
-    ToolType.HOE,
-    new Set(['tilled'])
-  ],
-  [
-    ToolType.WATERING_CAN,
-    new Set(['watered', 'planted'])
-  ],
-  [
-    ToolType.HARVEST_TOOL,
-    new Set(['dead'])
-  ]
+// Define transition rules: which states can be reached from a given tool
+const transitionRules = new Map<ToolType, Set<TileState>>([
+  ['hoe', new Set(['tilled'])], // hoe can only turn untilled → tilled
+  ['wateringCan', new Set(['watered', 'planted', 'growing'])], // wateringCan can water tilled, planted, or growing
+  ['harvestTool', new Set(['harvestable'])] // harvestTool can only harvest harvestable
 ]);
 
 /**
- * Validates if a transition from one tile state to another is allowed with the given tool
+ * Validates if a state transition is allowed based on the tool used.
  * @param from - current tile state
  * @param to - target tile state
  * @param tool - tool being used
  * @returns boolean indicating if transition is valid
  */
 export function canTransition(from: TileState, to: TileState, tool: ToolType): boolean {
-  // Watering can cannot be used on untilled tiles (explicit rejection per acceptance criteria)
-  if (tool === ToolType.WATERING_CAN && from === 'untilled') {
+  // Special case: wateringCan cannot be used on untilled tiles
+  if (tool === 'wateringCan' && from === 'untilled') {
     return false;
   }
 
-  // Get allowed target states for this tool
-  const allowedTargets = validTransitions.get(tool);
-  
-  // If tool has no defined transitions, deny
+  // Check if the target state is allowed by the tool's rules
+  const allowedTargets = transitionRules.get(tool);
   if (!allowedTargets) {
     return false;
   }
   
-  // Check if target state is in the allowed set
   return allowedTargets.has(to);
 }
 
 /**
- * Attempts to transition a tile from its current state to a new state using a tool
- * Dispatches updateTile action if transition is valid
- * @param id - tile ID
- * @param fromState - current tile state
- * @param newState - target tile state
- * @param tool - tool being used
+ * Applies a state transition to a tile and dispatches the update action.
+ * @param id - tile identifier
+ * @param from - current state of the tile
+ * @param to - target state
+ * @param tool - tool being used to trigger the transition
  * @returns boolean indicating if transition was successful
  */
-export function transition(id: string, fromState: TileState, newState: TileState, tool: ToolType): boolean {
-  // Check if transition is valid using the validation logic
-  if (!canTransition(fromState, newState, tool)) {
+export function transition(id: string, from: TileState, to: TileState, tool: ToolType): boolean {
+  // Validate transition before applying
+  if (!canTransition(from, to, tool)) {
     return false;
   }
-  
-  // Dispatch update action to Redux store
-  updateTile({ id, newState });
+
+  // Dispatch the update action to Redux store
+  updateTile({ id, newState: to });
   
   return true;
 }
