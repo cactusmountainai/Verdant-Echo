@@ -783,12 +783,12 @@
   {
     "id": "task_72",
     "description": "Implement timeSystem.ts with a tick() function that advances game time by 10 minutes per tick, handling minute-to-hour and hour-to-day rollovers correctly.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:23:20",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "57e71179"
   },
   {
