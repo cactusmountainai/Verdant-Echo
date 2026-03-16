@@ -805,12 +805,12 @@
   {
     "id": "task_74",
     "description": "Create sleep() function in timeSystem.ts that fades screen, triggers onDayEnd/onDayStart callbacks, and auto-saves after completion; integrate with FarmScene UI.",
-    "status": "Todo",
+    "status": "In Progress",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:32:05",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "aff832d9"
   },
   {

@@ -1,42 +1,105 @@
 class TimeSystem {
-  constructor() {
-    this.currentTime = 6; // Start at 6:00 AM
-    this.day = 1;
-    this.money = 100; // Example initial money
-    this.energy = 100; // Example initial energy
-  }
-
-  update(deltaTime) {
-    this.currentTime += deltaTime / (60 * 1000); // Convert ms to minutes, then to hours
-
-    // Check for day boundary at 2:00 AM (26:00)
-    if (this.currentTime >= 26) {
-      this.passOut();
+    constructor() {
+        this.isSleeping = false;
+        this.sleepFadeDuration = 1500; // 1.5 seconds fade duration
+        this.sleepInterval = null;
+        this.onDayEndCallback = null;
+        this.onDayStartCallback = null;
     }
-  }
 
-  passOut() {
-    // Deduct 10% of money
-    this.money *= 0.9;
-    
-    // Reset energy to full
-    this.energy = 100;
-    
-    // Advance directly to 6:00 AM next day (26 + 4 = 30)
-    this.currentTime = 30; // 6 AM next day
-    this.day++;
-    
-    // Optional: trigger UI event or notification
-    console.log(`Day ${this.day - 1} passed out at 2:00 AM. Money reduced by 10%. Energy reset. Now ${this.day}:06:00`);
-  }
+    sleep() {
+        if (this.isSleeping) return;
 
-  getTime() {
-    return this.currentTime;
-  }
+        this.isSleeping = true;
+        
+        // Trigger onDayEnd callback if defined
+        if (this.onDayEndCallback) {
+            this.onDayEndCallback();
+        }
+        
+        // Fade out screen
+        this.fadeOutScreen();
+        
+        // Simulate passage of time (e.g., overnight)
+        setTimeout(() => {
+            // Advance day/night cycle
+            this.advanceTime();
+            
+            // Fade in screen
+            this.fadeInScreen();
+            
+            // Trigger onDayStart callback if defined
+            if (this.onDayStartCallback) {
+                this.onDayStartCallback();
+            }
+            
+            // Auto-save after sleep completes
+            this.autoSave();
+            
+            this.isSleeping = false;
+        }, 2000); // Simulated overnight duration (2 seconds for demo)
+    }
 
-  getDay() {
-    return this.day;
-  }
+    fadeOutScreen() {
+        const overlay = document.createElement('div');
+        overlay.id = 'sleep-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'black';
+        overlay.style.zIndex = '9999';
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity ' + this.sleepFadeDuration + 'ms ease-in-out';
+        
+        document.body.appendChild(overlay);
+        
+        // Trigger fade out
+        setTimeout(() => {
+            overlay.style.opacity = '1';
+        }, 10);
+    }
+
+    fadeInScreen() {
+        const overlay = document.getElementById('sleep-overlay');
+        if (overlay) {
+            overlay.style.opacity = '0';
+            
+            // Remove after fade out completes
+            setTimeout(() => {
+                if (overlay && overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, this.sleepFadeDuration);
+        }
+    }
+
+    advanceTime() {
+        // This would normally advance the in-game time
+        // For now, just increment day counter or trigger events
+        console.log('Day advanced');
+    }
+
+    autoSave() {
+        // Call save function from FarmScene or global store
+        if (window.farmScene && typeof window.farmScene.saveGame === 'function') {
+            window.farmScene.saveGame();
+        } else if (typeof window.saveGame === 'function') {
+            window.saveGame();
+        }
+        
+        console.log('Auto-saved after sleep');
+    }
+
+    setOnDayEnd(callback) {
+        this.onDayEndCallback = callback;
+    }
+
+    setOnDayStart(callback) {
+        this.onDayStartCallback = callback;
+    }
 }
 
-export default TimeSystem;
+// Export instance for global use
+export const timeSystem = new TimeSystem();

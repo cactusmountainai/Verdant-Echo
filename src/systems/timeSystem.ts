@@ -1,35 +1,112 @@
-class TimeSystem {
-  private hours: number;
-  private minutes: number;
-  private day: number;
+import { TimeSystemState } from '../store/slices/timeSystemSlice';
+import { FarmScene } from '../scenes/FarmScene';
 
-  constructor() {
-    this.hours = 6;   // Start at 6 AM
-    this.minutes = 0;
-    this.day = 1;
+export class TimeSystem {
+  private currentTime: number = 0; // hours (0-23)
+  private currentDay: number = 1;
+  private isSleeping: boolean = false;
+  private onDayEndCallback: (() => void) | null = null;
+  private onDayStartCallback: (() => void) | null = null;
+  private farmScene: FarmScene | null = null;
+
+  constructor(farmScene: FarmScene) {
+    this.farmScene = farmScene;
   }
 
-  tick(): void {
-    this.minutes += 10;
-
-    // Handle minute-to-hour rollover
-    if (this.minutes >= 60) {
-      const hoursToAdd = Math.floor(this.minutes / 60);
-      this.hours += hoursToAdd;
-      this.minutes %= 60;
+  public sleep(): void {
+    if (this.isSleeping) return;
+    
+    this.isSleeping = true;
+    
+    // Trigger onDayEnd callback before fade
+    if (this.onDayEndCallback) {
+      this.onDayEndCallback();
     }
+    
+    // Fade out screen
+    this.fadeOutScreen(() => {
+      // Advance time: skip to next day at 7 AM
+      this.currentDay += 1;
+      this.currentTime = 7; // 7 AM next day
+      
+      // Fade in screen
+      this.fadeInScreen(() => {
+        // Trigger onDayStart callback after fade-in
+        if (this.onDayStartCallback) {
+          this.onDayStartCallback();
+        }
+        
+        // Auto-save game state
+        this.autoSave();
+        
+        // Update UI to reflect new day
+        if (this.farmScene) {
+          this.farmScene.updateUI();
+        }
+        
+        this.isSleeping = false;
+      });
+    });
+  }
 
-    // Handle hour-to-day rollover
-    if (this.hours >= 24) {
-      const daysToAdd = Math.floor(this.hours / 24);
-      this.day += daysToAdd;
-      this.hours %= 24;
+  private fadeOutScreen(callback: () => void): void {
+    const overlay = document.getElementById('game-overlay');
+    if (overlay) {
+      overlay.style.opacity = '1';
+      overlay.style.display = 'block';
+      
+      // Trigger CSS transition
+      setTimeout(() => {
+        callback();
+      }, 500); // Match CSS transition duration
+    } else {
+      callback(); // Fallback if no overlay
     }
   }
 
-  getTime(): { hours: number; minutes: number; day: number } {
-    return { hours: this.hours, minutes: this.minutes, day: this.day };
+  private fadeInScreen(callback: () => void): void {
+    const overlay = document.getElementById('game-overlay');
+    if (overlay) {
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          if (callback) callback();
+        }, 500); // Match CSS transition duration
+      }, 100);
+    } else {
+      callback(); // Fallback if no overlay
+    }
+  }
+
+  public autoSave(): void {
+    if (window.farmScene && typeof window.farmScene.saveGame === 'function') {
+      window.farmScene.saveGame();
+    } else if (typeof window.saveGame === 'function') {
+      window.saveGame();
+    }
+  }
+
+  public setOnDayEnd(callback: () => void): void {
+    this.onDayEndCallback = callback;
+  }
+
+  public setOnDayStart(callback: () => void): void {
+    this.onDayStartCallback = callback;
+  }
+
+  public getTime(): number {
+    return this.currentTime;
+  }
+
+  public getDay(): number {
+    return this.currentDay;
+  }
+
+  public tick(delta: number): void {
+    // Existing time progression logic
+    this.currentTime += delta / (1000 * 60); // Convert ms to hours
+    if (this.currentTime >= 24) {
+      this.currentTime -= 24;
+    }
   }
 }
-
-export default TimeSystem;
