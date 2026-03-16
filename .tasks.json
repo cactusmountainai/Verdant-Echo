@@ -724,5 +724,115 @@
     "review_feedback": "",
     "attempt_count": 1,
     "hash": "474db06e"
+  },
+  {
+    "id": "task_67",
+    "description": "Fix all TypeScript compilation errors in src/state/slices/*.ts and src/scenes/*.ts by adding explicit types, and create src/types/pako.d.ts and src/types/dexie.d.ts to resolve import errors.",
+    "status": "Done",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "2026-03-15T19:16:21",
+    "review_feedback": "",
+    "attempt_count": 1,
+    "hash": "fa83ab62"
+  },
+  {
+    "id": "task_68",
+    "description": "Enable `\"strict\": true` in tsconfig.json and verify `npm run build` exits with code 0.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "21047719"
+  },
+  {
+    "id": "task_69",
+    "description": "Remove all imports of src/state/store.ts from files in src/state/slices/, replacing direct dispatch calls with action creators.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "e5c00fb6"
+  },
+  {
+    "id": "task_70",
+    "description": "Convert BootScene, PreloadScene, and FarmScene to use named exports (export class), and update src/main.ts to import them via named imports.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "1378a24b"
+  },
+  {
+    "id": "task_71",
+    "description": "Refactor store.ts to split combined slice logic into individual slice files, define RootState type in src/state/types.ts, and add selector functions within each slice.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "51a9297e"
+  },
+  {
+    "id": "task_72",
+    "description": "Implement timeSystem.ts with a tick() function that advances game time by 10 minutes per tick, handling minute-to-hour and hour-to-day rollovers correctly.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "57e71179"
+  },
+  {
+    "id": "task_73",
+    "description": "Implement day boundary logic in timeSystem.ts to trigger pass-out at 2:00 AM (26:00), deduct 10% money, reset energy, and advance to 6:00 AM next day.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "510b9a13"
+  },
+  {
+    "id": "task_74",
+    "description": "Create sleep() function in timeSystem.ts that fades screen, triggers onDayEnd/onDayStart callbacks, and auto-saves after completion; integrate with FarmScene UI.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "aff832d9"
+  },
+  {
+    "id": "task_75",
+    "description": "Create src/systems/dailyResetSystem.ts to manage and register onDayEnd and onDayStart callback hooks for farm state resets (e.g., plant growth, energy restore).",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "aad0faca"
+  },
+  {
+    "id": "task_76",
+    "description": "Verify full crop loop (till \u2192 plant \u2192 water \u2192 sleep \u2192 grow \u2192 harvest \u2192 ship \u2192 earn) completes successfully with persistent save/load across day boundaries.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T19:15:18",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "c3d1eed9"
   }
 ]
