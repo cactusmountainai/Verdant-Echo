@@ -1,74 +1,79 @@
 import { store } from '../state/store';
 import { timeSystemSlice } from '../state/slices/timeSystemSlice';
+import { moneySlice } from '../state/slices/moneySlice';
+import { energySlice } from '../state/slices/energySlice';
 
-const dayStartAt = 6; // 6:00 AM
-const dayEndAt = 26;  // 2:00 AM next day (24 hours later in this system)
-const minutesPerTick = 10;
+// Constants for day cycle
+const DAY_START_AT = 6;   // 6:00 AM
+const DAY_END_AT = 26;    // 2:00 AM next day (26 in 24-hour format)
+const MINUTES_PER_TICK = 10;
 
-export class TimeSystem {
-  tick(): void {
-    const state = store.getState();
-    const { hour, minutes, day } = state.timeSystem;
-    
-    let newHour = hour;
-    let newMinutes = minutes + minutesPerTick;
-    let newDay = day;
-    
-    // Handle minute rollover
-    if (newMinutes >= 60) {
-      newMinutes -= 60;
-      newHour += 1;
-    }
-    
-    // Handle hour rollover and day transition
-    if (newHour >= dayEndAt) {
-      // Trigger pass-out sequence when reaching 2:00 AM (26:00)
-      this.triggerPassOutSequence();
-      
-      // Advance to next day at 6:00 AM
-      newDay += 1;
-      newHour = dayStartAt;
-      newMinutes = 0;
-    } else if (newHour >= 24) {
-      // Handle normal hour rollover (after midnight but before 2AM)
-      newHour -= 24;
-    }
-    
-    // Update time in Redux
-    store.dispatch(timeSystemSlice.actions.update({ 
-      hours: newHour, 
-      minutes: newMinutes,
-      day: newDay
-    }));
+/**
+ * Advances game time by 10 minutes and handles rollovers and pass-out sequence
+ */
+export function tick(): void {
+  const state = store.getState();
+  let { hour, minutes, day } = state.timeSystem;
+  
+  // Advance time by 10 minutes
+  minutes += MINUTES_PER_TICK;
+  
+  // Handle minute to hour rollover
+  if (minutes >= 60) {
+    minutes -= 60;
+    hour++;
   }
   
-  private triggerPassOutSequence(): void {
-    const state = store.getState();
-    
-    // Fade screen to black
+  // Check for pass-out condition (2:00 AM = 26 hours)
+  if (hour >= DAY_END_AT) {
+    // Trigger pass-out sequence
     const overlay = document.getElementById('game-overlay');
     if (overlay) {
       overlay.style.opacity = '1';
-      
-      // After delay, fade back out
+      // Allow time for fade effect
       setTimeout(() => {
-        overlay.style.opacity = '0';
-      }, 500);
+        // Deduct 10% of money (round down)
+        const currentMoney = state.money;
+        const newMoney = Math.floor(currentMoney * 0.9);
+        store.dispatch(moneySlice.actions.update(newMoney));
+        
+        // Reset energy to max
+        store.dispatch(energySlice.actions.resetToMax());
+        
+        // Advance to next day at 6:00 AM
+        hour = DAY_START_AT;
+        day++;
+        
+        // Update time in Redux
+        store.dispatch(timeSystemSlice.actions.update({
+          day,
+          hour,
+          minutes,
+          isNight: hour < DAY_START_AT || hour >= 22, // Night from 10PM to 6AM
+          lastUpdate: Date.now()
+        }));
+        
+        // Auto-save game after pass-out completes
+        window.farmScene?.saveGame();
+        
+        // Fade overlay back out
+        setTimeout(() => {
+          if (overlay) {
+            overlay.style.opacity = '0';
+          }
+        }, 1500);
+      }, 500); // Wait for fade-in effect
     }
+  } else {
+    // Normal time progression - update Redux state
+    const isNight = hour < DAY_START_AT || hour >= 22; // Night from 10PM to 6AM
     
-    // Deduct 10% of current money
-    const newMoney = Math.floor(state.money * 0.9);
-    store.dispatch({ type: 'money/update', payload: newMoney });
-    
-    // Reset energy to max
-    store.dispatch({ 
-      type: 'energy/resetToMax', 
-      payload: state.energyMax 
-    });
-    
-    // Auto-save game after pass-out
-    if (window.farmScene && window.farmScene.saveGame) {
-      window.farmScene.saveGame();
-    }
+    store.dispatch(timeSystemSlice.actions.update({
+      day,
+      hour,
+      minutes,
+      isNight,
+      lastUpdate: Date.now()
+    }));
   }
 }
