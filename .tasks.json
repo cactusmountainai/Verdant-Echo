@@ -761,12 +761,12 @@
   {
     "id": "task_70",
     "description": "Convert BootScene, PreloadScene, and FarmScene to use named exports (export class), and update src/main.ts to import them via named imports.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:18:03",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "1378a24b"
   },
   {
