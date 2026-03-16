@@ -1,70 +1,79 @@
 import { store } from '../store';
-import { updateTime } from '../state/slices/timeSystemSlice';
+import { updateTime, setDay } from '../state/slices/timeSystemSlice';
+
+const dayStartAt = 6; // 6:00 AM
+const dayEndAt = 26;  // 2:00 AM next day (24 + 2)
+const minutesPerTick = 10;
+const minutesInHour = 60;
+const minutesInDay = 24 * minutesInHour;
 
 export class TimeSystem {
-  private onDayEndCallback: (() => void) | null = null;
-  private onDayStartCallback: (() => void) | null = null;
-  private isSleeping: boolean = false;
-
-  setOnDayEnd(callback: () => void): void {
-    this.onDayEndCallback = callback;
-  }
-
-  setOnDayStart(callback: () => void): void {
-    this.onDayStartCallback = callback;
-  }
-
-  async sleep(): Promise<void> {
-    if (this.isSleeping) return;
-
-    this.isSleeping = true;
-
-    const state = store.getState().timeSystem;
-    let currentTime = state.currentTime;
-    let currentDay = state.currentDay;
-
-    // Trigger day end callback before fade-out
-    if (this.onDayEndCallback) {
-      this.onDayEndCallback();
+  async tick(): Promise<void> {
+    const state = store.getState();
+    let { hours, minutes, day } = state.timeSystem;
+    
+    // Advance time by 10 minutes
+    minutes += minutesPerTick;
+    
+    // Handle hour rollover
+    if (minutes >= minutesInHour) {
+      hours += Math.floor(minutes / minutesInHour);
+      minutes %= minutesInHour;
     }
-
-    // Fade out
+    
+    // Handle day rollover - check if we've passed 2:00 AM (dayEndAt)
+    const totalMinutes = day * minutesInDay + hours * minutesInHour + minutes;
+    const endOfDayMinutes = (dayStartAt + 24) * minutesInHour; // 26*60 = 1560 minutes
+    
+    if (totalMinutes >= endOfDayMinutes) {
+      // Trigger pass-out sequence
+      this.triggerPassOut();
+      
+      // Advance to next day at 6:00 AM
+      day += 1;
+      hours = dayStartAt;
+      minutes = 0;
+    } else if (hours >= 24) {
+      // Handle normal day rollover (if we somehow exceed 24 hours without hitting pass-out)
+      day += Math.floor(hours / 24);
+      hours %= 24;
+    }
+    
+    // Update Redux state
+    store.dispatch(updateTime({ hours, minutes }));
+    if (day !== state.timeSystem.day) {
+      store.dispatch(setDay(day));
+    }
+  }
+  
+  private triggerPassOut(): void {
+    // Get current money and energy from state
+    const state = store.getState();
+    const currentMoney = state.money || 0;
+    const maxEnergy = state.energyMax || 100; // Assuming energyMax exists in state
+    
+    // Deduct 10% of current money
+    const newMoney = Math.floor(currentMoney * 0.9);
+    
+    // Reset energy to max
+    store.dispatch({ type: 'energy/setEnergy', payload: maxEnergy });
+    store.dispatch({ type: 'money/updateMoney', payload: newMoney });
+    
+    // Fade screen to black
     const overlay = document.getElementById('game-overlay');
     if (overlay) {
       overlay.style.opacity = '1';
-      await new Promise(resolve => setTimeout(resolve, 500));
+      overlay.style.backgroundColor = 'black';
+      
+      // After fade completes, reset opacity (500ms duration)
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+      }, 500);
     }
-
-    // Update time: advance to next day if needed
-    currentTime = (currentTime + 1) % 24;
-    if (currentTime === 0) {
-      currentDay++;
-    }
-
-    // Dispatch updated time state
-    store.dispatch(updateTime({ currentTime, currentDay }));
-
-    // Fade in
-    if (overlay) {
-      overlay.style.opacity = '0';
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
-
-    // Trigger day start callback after fade-in
-    if (this.onDayStartCallback) {
-      this.onDayStartCallback();
-    }
-
-    // Auto-save
-    if (window.farmScene && window.farmScene.saveGame) {
+    
+    // Auto-save game state
+    if (window.farmScene && typeof window.farmScene.saveGame === 'function') {
       window.farmScene.saveGame();
     }
-
-    // Update UI
-    if (window.farmScene && window.farmScene.updateUI) {
-      window.farmScene.updateUI();
-    }
-
-    this.isSleeping = false;
   }
 }

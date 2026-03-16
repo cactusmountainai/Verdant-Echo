@@ -7,16 +7,17 @@ if [ -f "$HOME/.bashrc" ]; then
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TOOL_DIR="$HOME/.openclaw/workspace/TOOLS/smart-dev"
 
 case "$1" in
     init)
-        python3 "$SCRIPT_DIR/multi_agent.py" --init
+        python3 "$TOOL_DIR/multi_agent.py" --init
         ;;
     start)
-        python3 "$SCRIPT_DIR/multi_agent.py"
+        python3 "$TOOL_DIR/multi_agent.py"
         ;;
     once)
-        python3 "$SCRIPT_DIR/multi_agent.py" --once
+        python3 "$TOOL_DIR/multi_agent.py" --once
         ;;
     logs)
         tail -f .autonomous.log

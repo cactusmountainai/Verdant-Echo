@@ -2,6 +2,8 @@
 
 **Goal:** Make one complete, stable loop playable and persistent: **till → plant → water → sleep → grow → harvest → ship → earn → reload successfully**.
 
+**Architecture Constraint:** ALL code must be Phaser 3 + TypeScript. NO React hooks, NO React components, NO Redux for game logic. Use Phaser scenes, systems, and state management only.
+
 **Duration:** 1-2 weeks (adjust based on team velocity)
 
 **Definition of Done:**
@@ -415,6 +417,43 @@ Fix all compilation errors, type mismatches, and dependency issues. The game mus
 - `src/scenes/FarmScene.ts`
 
 **Acceptance:** HUD displays all info, updates in real-time
+
+---
+
+## CRITICAL ARCHITECTURE CONSTRAINTS
+
+### DO NOT:
+- Use React hooks (useState, useEffect, etc.) for game logic
+- Create React components for game UI (use Phaser GameObjects instead)
+- Use Redux for real-time game state (use Phaser's built-in state)
+- Build a React app that hosts Phaser — Phaser IS the app
+
+### DO:
+- Use Phaser 3 scenes for all game screens
+- Use Phaser GameObjects (Sprite, Text, Container) for UI
+- Use Redux ONLY for save/load persistence, not runtime game logic
+- Use TypeScript classes in `src/systems/` for game logic
+- Use `src/components/` for reusable Phaser GameObject factories
+
+### Example Pattern:
+```typescript
+// GOOD: Phaser system
+export class TimeSystem {
+  private scene: Phaser.Scene;
+  private currentTime: number = 600; // 6:00 AM
+  
+  tick() {
+    this.currentTime += 10; // +10 minutes
+    this.updateDisplay();
+  }
+}
+
+// BAD: React hook
+export const useTime = () => {
+  const [time, setTime] = useState(600);
+  useEffect(() => { ... }, []);
+}
+```
 
 ---
 
