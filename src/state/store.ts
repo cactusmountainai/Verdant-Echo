@@ -19,18 +19,18 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage,
-  whitelist: ['crop'], // Only persist crop state for now
+  whitelist: ['crop', 'timeSystem'], // Persist both crop and time system states
 };
 
-const persistedCropReducer = persistReducer(persistConfig, cropReducer);
+const persistedReducer = persistReducer(persistConfig, combineReducers({
+  timeSystem: timeSystemReducer,
+  projectTimeline: projectTimelineReducer,
+  farmScene: farmSceneReducer,
+  crop: cropReducer,
+}));
 
 export const store = configureStore({
-  reducer: {
-    timeSystem: timeSystemReducer,
-    projectTimeline: projectTimelineReducer,
-    farmScene: farmSceneReducer,
-    crop: persistedCropReducer,
-  },
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

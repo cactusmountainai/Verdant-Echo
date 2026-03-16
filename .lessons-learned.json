@@ -76,5 +76,11 @@
     "category": "typescript",
     "timestamp": "2026-03-15T20:16:58",
     "iteration": 7
+  },
+  {
+    "lesson": "Code failed to compile: . Always run TypeScript check before marking complete.",
+    "category": "typescript",
+    "timestamp": "2026-03-15T20:21:27",
+    "iteration": 8
   }
 ]
