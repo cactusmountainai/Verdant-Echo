@@ -1,34 +1,54 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ProjectTimelineState } from '../../models/project_timeline';
+import type { RootState } from '../types';
+
+interface ProjectTimelineState {
+  events: Array<{
+    id: string;
+    title: string;
+    date: number;
+    description: string;
+    status: 'planned' | 'in-progress' | 'completed';
+  }>;
+  selectedEventId: string | null;
+}
 
 const initialState: ProjectTimelineState = {
-  milestones: [],
-  tasks: [],
-  currentPhase: 'planning',
-  progress: 0,
+  events: [],
+  selectedEventId: null
 };
 
 export const projectTimelineSlice = createSlice({
   name: 'projectTimeline',
   initialState,
   reducers: {
-    addMilestone: (state, action: PayloadAction<any>) => {
-      state.milestones.push(action.payload);
+    addEvent: (state, action: PayloadAction<Omit<ProjectTimelineState['events'][0], 'id'>>) => {
+      state.events.push({
+        id: Date.now().toString(),
+        ...action.payload
+      });
     },
-    updateTaskStatus: (state, action: PayloadAction<{ id: string; status: string }>) => {
-      const task = state.tasks.find(t => t.id === action.payload.id);
-      if (task) {
-        task.status = action.payload.status;
+    updateEvent: (state, action: PayloadAction<{id: string; updates: Partial<ProjectTimelineState['events'][0]>}>) => {
+      const event = state.events.find(e => e.id === action.payload.id);
+      if (event) {
+        Object.assign(event, action.payload.updates);
       }
     },
-    setPhase: (state, action: PayloadAction<string>) => {
-      state.currentPhase = action.payload;
+    deleteEvent: (state, action: PayloadAction<string>) => {
+      state.events = state.events.filter(e => e.id !== action.payload);
     },
-    updateProgress: (state, action: PayloadAction<number>) => {
-      state.progress = Math.max(0, Math.min(100, action.payload));
-    },
-  },
+    selectEvent: (state, action: PayloadAction<string | null>) => {
+      state.selectedEventId = action.payload;
+    }
+  }
 });
 
-export const { addMilestone, updateTaskStatus, setPhase, updateProgress } = projectTimelineSlice.actions;
+export const { addEvent, updateEvent, deleteEvent, selectEvent } = projectTimelineSlice.actions;
+
+// Selectors
+export const selectProjectTimeline = (state: RootState) => state.projectTimeline;
+export const selectEvents = (state: RootState) => state.projectTimeline.events;
+export const selectSelectedEventId = (state: RootState) => state.projectTimeline.selectedEventId;
+export const selectEventById = (state: RootState, eventId: string) => 
+  state.projectTimeline.events.find(e => e.id === eventId);
+
 export default projectTimelineSlice.reducer;

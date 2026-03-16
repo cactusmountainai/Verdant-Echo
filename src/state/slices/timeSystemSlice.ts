@@ -1,12 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { TimeSystemState } from '../../systems/timeSystem';
+import type { RootState } from '../types';
+
+interface TimeSystemState {
+  currentTime: number;
+  isPaused: boolean;
+  speed: number;
+}
 
 const initialState: TimeSystemState = {
   currentTime: 0,
-  speed: 1,
   isPaused: false,
-  day: 1,
-  hour: 6,
+  speed: 1.0
 };
 
 export const timeSystemSlice = createSlice({
@@ -21,13 +25,16 @@ export const timeSystemSlice = createSlice({
     },
     setSpeed: (state, action: PayloadAction<number>) => {
       state.speed = action.payload;
-    },
-    advanceDay: (state) => {
-      state.day += 1;
-      state.hour = 6; // Reset to morning
-    },
-  },
+    }
+  }
 });
 
-export const { updateTime, togglePause, setSpeed, advanceDay } = timeSystemSlice.actions;
+export const { updateTime, togglePause, setSpeed } = timeSystemSlice.actions;
+
+// Selectors
+export const selectTimeSystem = (state: RootState) => state.timeSystem;
+export const selectCurrentTime = (state: RootState) => state.timeSystem.currentTime;
+export const selectIsPaused = (state: RootState) => state.timeSystem.isPaused;
+export const selectSpeed = (state: RootState) => state.timeSystem.speed;
+
 export default timeSystemSlice.reducer;

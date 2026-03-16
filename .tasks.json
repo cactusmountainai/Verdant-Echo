@@ -772,12 +772,12 @@
   {
     "id": "task_71",
     "description": "Refactor store.ts to split combined slice logic into individual slice files, define RootState type in src/state/types.ts, and add selector functions within each slice.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:21:32",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "51a9297e"
   },
   {

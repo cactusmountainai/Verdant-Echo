@@ -1,33 +1,46 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FarmSceneState } from '../../FarmScene';
+import type { RootState } from '../types';
+
+interface FarmSceneState {
+  sceneLoaded: boolean;
+  cameraPosition: { x: number; y: number; z: number };
+  selectedObject: string | null;
+  isEditing: boolean;
+}
 
 const initialState: FarmSceneState = {
-  crops: [],
-  animals: [],
-  structures: [],
-  resources: {
-    water: 100,
-    fertilizer: 50,
-    seeds: 20,
-  },
+  sceneLoaded: false,
+  cameraPosition: { x: 0, y: 0, z: 10 },
+  selectedObject: null,
+  isEditing: false
 };
 
 export const farmSceneSlice = createSlice({
   name: 'farmScene',
   initialState,
   reducers: {
-    addCrop: (state, action: PayloadAction<any>) => {
-      state.crops.push(action.payload);
+    setSceneLoaded: (state, action: PayloadAction<boolean>) => {
+      state.sceneLoaded = action.payload;
     },
-    removeCrop: (state, action: PayloadAction<number>) => {
-      state.crops = state.crops.filter((_, index) => index !== action.payload);
+    updateCameraPosition: (state, action: PayloadAction<{ x: number; y: number; z: number }>) => {
+      state.cameraPosition = action.payload;
     },
-    updateResource: (state, action: PayloadAction<{ resource: keyof typeof initialState.resources; amount: number }>) => {
-      const { resource, amount } = action.payload;
-      state.resources[resource] += amount;
+    selectObject: (state, action: PayloadAction<string | null>) => {
+      state.selectedObject = action.payload;
     },
-  },
+    toggleEditing: (state) => {
+      state.isEditing = !state.isEditing;
+    }
+  }
 });
 
-export const { addCrop, removeCrop, updateResource } = farmSceneSlice.actions;
+export const { setSceneLoaded, updateCameraPosition, selectObject, toggleEditing } = farmSceneSlice.actions;
+
+// Selectors
+export const selectFarmScene = (state: RootState) => state.farmScene;
+export const selectSceneLoaded = (state: RootState) => state.farmScene.sceneLoaded;
+export const selectCameraPosition = (state: RootState) => state.farmScene.cameraPosition;
+export const selectSelectedObject = (state: RootState) => state.farmScene.selectedObject;
+export const selectIsEditing = (state: RootState) => state.farmScene.isEditing;
+
 export default farmSceneSlice.reducer;
