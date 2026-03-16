@@ -1,37 +1,49 @@
-export interface Project {
-  id: string;
+export class Project {
+  id?: string | number;
   name: string;
-  description?: string;
-  ownerId: string; // foreign key to User.id
+  location: string;
+  areaHectares: number;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
-  status: 'draft' | 'active' | 'archived';
-  metadata?: Record<string, any>; // for game-specific config (e.g., level data, settings)
-}
 
-export class ProjectEntity implements Project {
-  id: string;
-  name: string;
-  description?: string;
-  ownerId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  status: 'draft' | 'active' | 'archived';
-  metadata?: Record<string, any>;
-
-  constructor(data: Omit<Project, 'createdAt' | 'updatedAt'>) {
-    this.id = data.id;
-    this.name = data.name;
-    this.description = data.description;
-    this.ownerId = data.ownerId;
-    this.status = data.status || 'draft';
-    this.metadata = data.metadata;
+  constructor(
+    name: string, 
+    location: string, 
+    areaHectares: number, 
+    status: string = 'planned'
+  ) {
+    this.name = name.trim();
+    this.location = location.trim();
+    this.areaHectares = Math.max(0, areaHectares);
+    this.status = status.toLowerCase() === 'active' || status.toLowerCase() === 'completed' || status.toLowerCase() === 'paused' 
+      ? status.toLowerCase() : 'planned';
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
 
-  update(data: Partial<Project>): void {
-    Object.assign(this, data);
-    this.updatedAt = new Date();
+  // Validation method
+  validate(): boolean {
+    if (!this.name || this.name.trim().length === 0) return false;
+    if (!this.location || this.location.trim().length === 0) return false;
+    if (this.areaHectares <= 0) return false;
+    
+    const validStatuses = ['planned', 'active', 'completed', 'paused'];
+    if (!validStatuses.includes(this.status)) return false;
+
+    return true;
+  }
+
+  // Convert to JSON serializable object
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      location: this.location,
+      areaHectares: this.areaHectares,
+      status: this.status,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt
+    };
   }
 }
