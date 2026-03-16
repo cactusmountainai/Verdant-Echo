@@ -1,39 +1,25 @@
-export class Calculator {
-  add(a: number, b: number): number {
-    if (typeof a !== 'number' || typeof b !== 'number') {
-      throw new Error('Both arguments must be numbers');
-    }
-    return a + b;
-  }
+// This is now just a custom hook — no direct import from store.ts
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from './state/store';
+import { calculateSync, clearResult } from './state/slices/calculatorSlice';
 
-  subtract(a: number, b: number): number {
-    if (typeof a !== 'number' || typeof b !== 'number') {
-      throw new Error('Both arguments must be numbers');
-    }
-    return a - b;
-  }
+export const useCalculator = () => {
+  const dispatch = useDispatch();
+  const { result, loading, error } = useSelector((state: RootState) => state.calculator);
 
-  multiply(a: number, b: number): number {
-    if (typeof a !== 'number' || typeof b !== 'number') {
-      throw new Error('Both arguments must be numbers');
-    }
-    return a * b;
-  }
+  const calculate = (a: number, b: number) => {
+    // Dispatch synchronous action
+    dispatch(calculateSync({ a, b }));
+  };
 
-  divide(a: number, b: number): number {
-    if (typeof a !== 'number' || typeof b !== 'number') {
-      throw new Error('Both arguments must be numbers');
-    }
-    if (b === 0) {
-      throw new Error('Cannot divide by zero');
-    }
-    return a / b;
-  }
+  const calculateAsync = async (a: number, b: number) => {
+    // Dispatch async thunk
+    await dispatch(calculateAsync({ a, b })).unwrap();
+  };
 
-  power(base: number, exponent: number): number {
-    if (typeof base !== 'number' || typeof exponent !== 'number') {
-      throw new Error('Both arguments must be numbers');
-    }
-    return Math.pow(base, exponent);
-  }
-}
+  const clear = () => {
+    dispatch(clearResult());
+  };
+
+  return { result, loading, error, calculate, calculateAsync, clear };
+};

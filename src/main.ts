@@ -1,14 +1,14 @@
-import { createApp } from 'vue';
-import App from './app.module.vue';
-import { projectTimelineService } from './services/projectTimelineService';
-import { initializeTimelineService } from './services/initTimelineService';
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
+import { Provider } from 'react-redux';
+import { store } from './state/store';
+import App from './App';
 
-// Initialize timeline service before app creation (awaited)
-async function bootstrap() {
-  await initializeTimelineService();
-  
-  const app = createApp(App);
-  app.mount('#app');
-}
-
-bootstrap();
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+root.render(
+  <StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </StrictMode>
+);
