@@ -266,12 +266,12 @@
   {
     "id": "task_25",
     "description": "Create documentation template for API endpoints and CLI usage with examples based on GOAL.md",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T16:43:15",
-    "updated_at": "",
+    "updated_at": "2026-03-15T17:15:44",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "b49d7740"
   },
   {
