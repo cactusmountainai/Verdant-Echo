@@ -1,62 +1,64 @@
-import { TileState } from '../types/farm';
 import { updateTile } from '../state/slices/farmSlice';
+import { TileState, ToolType } from '../types/farm';
 
-// Define valid transitions based on tool usage
-const validTransitions: Map<string, Set<TileState>> = new Map([
-  // Hoe transitions
-  ['hoe', new Set(['tilled'])],
-  // WateringCan transitions
-  ['wateringCan', new Set(['watered', 'planted'])],
-  // HarvestTool transitions
-  ['harvestTool', new Set(['dead'])],
-  // Automatic transitions (any tool or no tool allowed)
-  ['', new Set(['planted', 'growing', 'harvestable', 'dead'])]
+// Define valid transitions per tool
+const validTransitions = new Map<ToolType, Set<TileState>>([
+  [
+    ToolType.HOE,
+    new Set(['tilled'])
+  ],
+  [
+    ToolType.WATERING_CAN,
+    new Set(['watered', 'planted'])
+  ],
+  [
+    ToolType.HARVEST_TOOL,
+    new Set(['dead'])
+  ]
 ]);
 
 /**
  * Validates if a transition from one tile state to another is allowed with the given tool
- * @param from - Current tile state
- * @param to - Target tile state
- * @param tool - Tool being used
+ * @param from - current tile state
+ * @param to - target tile state
+ * @param tool - tool being used
  * @returns boolean indicating if transition is valid
  */
 export function canTransition(from: TileState, to: TileState, tool: ToolType): boolean {
-  // Special case: water cannot be applied to untilled tiles
-  if (tool === ToolType.WATERING_CAN && from === 'untillled') {
+  // Watering can cannot be used on untilled tiles (explicit rejection per acceptance criteria)
+  if (tool === ToolType.WATERING_CAN && from === 'untilled') {
     return false;
   }
 
-  // Check if there's a specific rule for this tool
-  const toolRules = validTransitions.get(tool);
-  if (toolRules && toolRules.has(to)) {
-    return true;
+  // Get allowed target states for this tool
+  const allowedTargets = validTransitions.get(tool);
+  
+  // If tool has no defined transitions, deny
+  if (!allowedTargets) {
+    return false;
   }
-
-  // Check for automatic transitions (any tool allowed)
-  const autoRules = validTransitions.get('');
-  if (autoRules && autoRules.has(to)) {
-    return true;
-  }
-
-  // Default: transition not allowed
-  return false;
+  
+  // Check if target state is in the allowed set
+  return allowedTargets.has(to);
 }
 
 /**
- * Applies a state transition to a tile if valid, otherwise does nothing
- * @param id - Tile ID to update
- * @param from - Current tile state
- * @param to - Target tile state
- * @param tool - Tool being used for the transition
+ * Attempts to transition a tile from its current state to a new state using a tool
+ * Dispatches updateTile action if transition is valid
+ * @param id - tile ID
+ * @param fromState - current tile state
+ * @param newState - target tile state
+ * @param tool - tool being used
  * @returns boolean indicating if transition was successful
  */
-export function transition(id: string, from: TileState, to: TileState, tool: ToolType): boolean {
-  // Validate transition before applying
-  if (!canTransition(from, to, tool)) {
+export function transition(id: string, fromState: TileState, newState: TileState, tool: ToolType): boolean {
+  // Check if transition is valid using the validation logic
+  if (!canTransition(fromState, newState, tool)) {
     return false;
   }
-
-  // Dispatch the update action to change tile state
-  updateTile({ id, newState: to });
+  
+  // Dispatch update action to Redux store
+  updateTile({ id, newState });
+  
   return true;
 }
