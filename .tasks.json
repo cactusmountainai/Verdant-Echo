@@ -394,5 +394,115 @@
     "review_feedback": "",
     "attempt_count": 1,
     "hash": "e55e8d12"
+  },
+  {
+    "id": "task_37",
+    "description": "Run `npm run build` and fix all TypeScript compilation errors in `src/state/slices/`, `src/scenes/*.ts`, and `src/lib/dexie.ts`; ensure zero errors/warnings with strict mode enabled in `tsconfig.json`.",
+    "status": "Done",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "2026-03-15T18:29:12",
+    "review_feedback": "",
+    "attempt_count": 1,
+    "hash": "32983a5f"
+  },
+  {
+    "id": "task_38",
+    "description": "Remove all instances where reducers import or call `store.dispatch()`, convert side effects to thunks/middleware, and verify no file in `src/state/slices/` imports from `src/state/store.ts`.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "1888243d"
+  },
+  {
+    "id": "task_39",
+    "description": "Standardize all scene files (`BootScene.ts`, `PreloadScene.ts`, `FarmScene.ts`) to use named exports (`export class ...`) and update imports in `src/main.ts` to match.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "4c8091e8"
+  },
+  {
+    "id": "task_40",
+    "description": "Refactor `src/state/store.ts` to compose slices using `createSlice` from dedicated slice files, ensuring `RootState` type accurately reflects all slice states without any `as any` casts.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "796d46ee"
+  },
+  {
+    "id": "task_41",
+    "description": "Add selector factory functions in `src/state/slices/` for common state access (e.g., `selectCrops`, `selectDay`) and verify all return types are explicit.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "ecdc6381"
+  },
+  {
+    "id": "task_42",
+    "description": "Verify `npm run type-check` passes (add script if missing) and resolve all red squiggles in VS Code across the entire project.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "cce73fe2"
+  },
+  {
+    "id": "task_43",
+    "description": "Add minimal `.d.ts` declaration files for `pako`, `dexie`, and `phaser` only if third-party types are missing, with explanatory comments for each `// @ts-ignore`.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "f940bc00"
+  },
+  {
+    "id": "task_44",
+    "description": "Confirm game boots correctly from `BootScene` \u2192 `PreloadScene` \u2192 `FarmScene` by manually testing the scene registration chain in `src/main.ts`.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "b8645800"
+  },
+  {
+    "id": "task_45",
+    "description": "Run full test suite after Redux refactor to ensure no behavioral changes occur in state updates or side effects.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "1e43cc05"
+  },
+  {
+    "id": "task_46",
+    "description": "Validate that `RootState` type is exported correctly from `src/state/types.ts` and consumed consistently across all slices without type mismatches.",
+    "status": "Todo",
+    "assignee": "manager",
+    "created_at": "2026-03-15T18:27:13",
+    "updated_at": "",
+    "review_feedback": "",
+    "attempt_count": 0,
+    "hash": "5845a105"
   }
 ]
