@@ -794,12 +794,12 @@
   {
     "id": "task_73",
     "description": "Implement day boundary logic in timeSystem.ts to trigger pass-out at 2:00 AM (26:00), deduct 10% money, reset energy, and advance to 6:00 AM next day.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:15:18",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:24:40",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "510b9a13"
   },
   {
