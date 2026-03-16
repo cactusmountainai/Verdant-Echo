@@ -1,70 +1,57 @@
-# Farm Management Application
+# Farm Management Game - Project Status
 
-A Phaser-based farm management game with time systems, data persistence, and project timeline tracking.
+## 📦 Project Structure
 
-## 📁 Project Status
-- ✅ Core models implemented
-- ✅ Time system functional
-- ✅ Storage layer (Dexie) configured
-- ✅ Scenes (Boot, Preload, Farm) ready
-- ⚙️ Services layer active (data ingestion, import, meetings)
+### Core Systems
+- **Time System**: `src/systems/timeSystem.ts` - Daily reset cycle management
+- **Storage**: `src/storage/dexie.ts` + `src/storage/saveService.ts` - Dexie.js DB integration
+- **State**: `src/state/store.ts` - Vite/Vuex state management
 
-## 🗂️ File Structure
+### Models (Data Layer)
+- `src/models/BaseModel.ts` - Abstract base for all entities
+- `src/models/Project.ts` - Farm project data
+- `src/models/User.ts` - User account data
+- `src/models/ProjectTimeline.ts` - Timeline events
+- `src/models/meeting.py` - Meeting logic (Python backend?)
+- `src/models/storage.py` - Storage logic (Python backend?)
+- `src/models/data_ingestion.py` - Data ingestion (Python backend?)
+- `src/models/farm_scene.py` - Farm scene (Python backend?)
+- `src/models/time_system.py` - Time system (Python backend?)
+- `src/models/init_timeline.py` - Init timeline (Python backend?)
 
-### Configuration
-- `vite.config.ts` - Build configuration
-- `jest.config.js` - Test setup
-- `src/config/index.ts` - Main config
-- `src/config/loader.ts` - Config loader
-- `src/config/timelineConfig.ts` - Timeline settings
+### Scenes (Phaser.js)
+- `src/scenes/BootScene.ts` - App initialization
+- `src/scenes/PreloadScene.ts` - Asset loading
+- `src/scenes/FarmScene.ts` - Main farm game scene
 
-### Models (`models/` & `src/models/`)
-- `BaseModel.ts` - Base model class
-- `User.ts` - User entity
-- `Project.ts` - Project entity
-- `ProjectTimeline.ts` - Project timeline
-- `meeting.py` - Meeting model
-- `storage.py` - Storage model
-- `project_timeline.py` - Timeline model
-- `base.py` - Base model
-- `data_ingestion.py` - Data ingestion model
-- `farm_scene.py` - Farm scene model
-- `data_import.py` - Data import model
-- `time_system.py` - Time system model
-- `init_timeline.py` - Initial timeline setup
+### Services
+- `src/services/dataImportService.ts` - Data import handling
+- `src/services/dataIngestionService.ts` - Data ingestion
+- `src/services/projectTimelineService.ts` - Timeline operations
+- `src/services/meetingService.ts` - Meeting management
+- `src/services/initTimelineService.ts` - Init timeline setup
 
-### Scenes (`src/scenes/`)
-- `FarmScene.ts` - Main farm scene
-- `PreloadScene.ts` - Asset loading
-- `BootScene.ts` - Application bootstrap
+### Config & Types
+- `src/config/timelineConfig.ts` - Timeline configuration
+- `src/state/types.ts` - TypeScript type definitions
+- `types/dexie.d.ts` - Dexie type declarations
+- `types/pako.d.ts` - Pako library types
+- `types/phaser.d.ts` - Phaser library types
 
-### Systems (`src/systems/`)
-- `timeSystem.ts` - Core time management
-- `dailyResetSystem.ts` - Daily reset logic
+### Testing
+- `test/calculator.test.ts` - Calculator unit tests
 
-### Services (`src/services/`)
-- `dataImportService.ts` - Data import
-- `dataIngestionService.ts` - Data ingestion
-- `projectTimelineService.ts` - Timeline operations
-- `meetingService.ts` - Meeting operations
-- `initTimelineService.ts` - Timeline initialization
+### Build Configuration
+- `vite.config.ts` - Vite bundler config
+- `jest.config.js` - Jest test config
 
-### Storage (`src/storage/` & `models/`)
-- `dexie.ts` - Dexie database setup
-- `saveService.ts` - Save/load service
-- `storage.py` - Storage model
+## 🎯 Current Status
+- **Frontend**: TypeScript + Phaser.js + Vite
+- **Backend**: Python models (separate backend service)
+- **Storage**: Dexie.js local DB + save/load system
+- **Time System**: Daily reset cycle implemented
 
-### State (`src/state/`)
-- `store.ts` - Application state store
-- `types.ts` - Type definitions
-
-### Types
-- `dexie.d.ts` - Dexie type declarations
-- `pako.d.ts` - Pako compression types
-- `phaser.d.ts` - Phaser type declarations
-
-### Utilities
-- `calculator.ts` - Calculation logic
-- `hooks/useCropCycle.ts` - Crop cycle hook
-
-## 🚀 Quick Start
+## 📝 Notes
+- Python models appear to be for backend API integration
+- TypeScript frontend handles game logic and UI
+- Use `FILE:` markers for new documentation files

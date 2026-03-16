@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface TimeSystemState {
+export const DAY_START_AT = 6;
+export const DAY_END_AT = 26;
+
+interface TimeSystemState {
   day: number;
   hour: number;
   minutes: number;
@@ -13,40 +16,23 @@ const initialState: TimeSystemState = {
   hour: 6,
   minutes: 0,
   isNight: false,
-  lastUpdate: Date.now()
+  lastUpdate: Date.now(),
 };
 
-export const timeSystemSlice = createSlice({
+const timeSystemSlice = createSlice({
   name: 'timeSystem',
   initialState,
   reducers: {
-    update: (state, action: PayloadAction<{ hours: number; minutes: number; day?: number }>) => {
-      state.hour = action.payload.hours;
-      state.minutes = action.payload.minutes;
-      if (action.payload.day !== undefined) {
-        state.day = action.payload.day;
-      }
-      state.lastUpdate = Date.now();
-      
-      // Update isNight based on hour (night from 20:00 to 6:00)
-      state.isNight = action.payload.hours >= 20 || action.payload.hours < dayStartAt;
-    },
-    setDay: (state, action: PayloadAction<number>) => {
-      state.day = action.payload;
+    update(state, action: PayloadAction<{ hours: number; minutes: number; day: number }>) {
+      const { hours, minutes, day } = action.payload;
+      state.hour = hours;
+      state.minutes = minutes;
+      state.day = day;
+      state.isNight = hours < DAY_START_AT || hours >= 20;
       state.lastUpdate = Date.now();
     },
-    setTime: (state, action: PayloadAction<{ hour: number; minutes: number }>) => {
-      state.hour = action.payload.hour;
-      state.minutes = action.payload.minutes;
-      state.lastUpdate = Date.now();
-      
-      // Update isNight based on hour
-      state.isNight = action.payload.hour >= 20 || action.payload.hour < dayStartAt;
-    },
-    reset: () => initialState,
   },
 });
 
-export const { update, setDay, setTime, reset } = timeSystemSlice.actions;
-
+export const { update } = timeSystemSlice.actions;
 export default timeSystemSlice.reducer;
