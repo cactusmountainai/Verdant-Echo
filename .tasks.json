@@ -464,12 +464,12 @@
   {
     "id": "task_43",
     "description": "Add minimal `.d.ts` declaration files for `pako`, `dexie`, and `phaser` only if third-party types are missing, with explanatory comments for each `// @ts-ignore`.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:27:13",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:46:15",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "f940bc00"
   },
   {
