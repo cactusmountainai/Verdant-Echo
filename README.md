@@ -49,6 +49,7 @@ python3 -m http.server 8000
 | `src/` | Game source code |
 | `assets/` | Sprites, audio, data |
 | `GOAL.md` | Full game design document |
+| `SPRINT_PLAN.md` | Six-stage execution plan for multi-agent delivery |
 
 ## Development
 
