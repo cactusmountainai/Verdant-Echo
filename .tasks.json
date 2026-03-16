@@ -695,12 +695,12 @@
   {
     "id": "task_64",
     "description": "Confirm that no file in `src/state/slices/` imports from `src/state/store.ts`; audit all slice files to ensure they only import action creators or types.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T19:05:45",
-    "updated_at": "",
+    "updated_at": "2026-03-15T19:12:27",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "2325cebc"
   },
   {
