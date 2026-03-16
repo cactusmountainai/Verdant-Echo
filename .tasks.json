@@ -475,12 +475,12 @@
   {
     "id": "task_44",
     "description": "Confirm game boots correctly from `BootScene` \u2192 `PreloadScene` \u2192 `FarmScene` by manually testing the scene registration chain in `src/main.ts`.",
-    "status": "Todo",
+    "status": "Done",
     "assignee": "manager",
     "created_at": "2026-03-15T18:27:13",
-    "updated_at": "",
+    "updated_at": "2026-03-15T18:46:54",
     "review_feedback": "",
-    "attempt_count": 0,
+    "attempt_count": 1,
     "hash": "b8645800"
   },
   {
