@@ -1,78 +1,73 @@
-import { store } from '../store';
-import { updateTime, setDay } from '../state/slices/timeSystemSlice';
+import { store } from '../state/store';
+import { timeSystemSlice } from '../state/slices/timeSystemSlice';
 
 const dayStartAt = 6; // 6:00 AM
-const dayEndAt = 26;  // 2:00 AM next day (24 + 2)
+const dayEndAt = 26;  // 2:00 AM next day (24 hours later in this system)
 const minutesPerTick = 10;
-const minutesInHour = 60;
-const minutesInDay = 24 * minutesInHour;
 
 export class TimeSystem {
-  async tick(): Promise<void> {
+  tick(): void {
     const state = store.getState();
-    let { hours, minutes, day } = state.timeSystem;
+    const { hour, minutes, day } = state.timeSystem;
     
-    // Advance time by 10 minutes
-    minutes += minutesPerTick;
+    let newHour = hour;
+    let newMinutes = minutes + minutesPerTick;
+    let newDay = day;
     
-    // Handle hour rollover
-    if (minutes >= minutesInHour) {
-      hours += Math.floor(minutes / minutesInHour);
-      minutes %= minutesInHour;
+    // Handle minute rollover
+    if (newMinutes >= 60) {
+      newMinutes -= 60;
+      newHour += 1;
     }
     
-    // Handle day rollover - check if we've passed 2:00 AM (dayEndAt)
-    const totalMinutes = day * minutesInDay + hours * minutesInHour + minutes;
-    const endOfDayMinutes = (dayStartAt + 24) * minutesInHour; // 26*60 = 1560 minutes
-    
-    if (totalMinutes >= endOfDayMinutes) {
-      // Trigger pass-out sequence
-      this.triggerPassOut();
+    // Handle hour rollover and day transition
+    if (newHour >= dayEndAt) {
+      // Trigger pass-out sequence when reaching 2:00 AM (26:00)
+      this.triggerPassOutSequence();
       
       // Advance to next day at 6:00 AM
-      day += 1;
-      hours = dayStartAt;
-      minutes = 0;
-    } else if (hours >= 24) {
-      // Handle normal day rollover (if we somehow exceed 24 hours without hitting pass-out)
-      day += Math.floor(hours / 24);
-      hours %= 24;
+      newDay += 1;
+      newHour = dayStartAt;
+      newMinutes = 0;
+    } else if (newHour >= 24) {
+      // Handle normal hour rollover (after midnight but before 2AM)
+      newHour -= 24;
     }
     
-    // Update Redux state
-    store.dispatch(updateTime({ hours, minutes }));
-    if (day !== state.timeSystem.day) {
-      store.dispatch(setDay(day));
-    }
+    // Update time in Redux
+    store.dispatch(timeSystemSlice.actions.update({ 
+      hours: newHour, 
+      minutes: newMinutes,
+      day: newDay
+    }));
   }
   
-  private triggerPassOut(): void {
-    // Get current money and energy from state
+  private triggerPassOutSequence(): void {
     const state = store.getState();
-    const currentMoney = state.money || 0;
-    const maxEnergy = state.energyMax || 100; // Assuming energyMax exists in state
-    
-    // Deduct 10% of current money
-    const newMoney = Math.floor(currentMoney * 0.9);
-    
-    // Reset energy to max
-    store.dispatch({ type: 'energy/setEnergy', payload: maxEnergy });
-    store.dispatch({ type: 'money/updateMoney', payload: newMoney });
     
     // Fade screen to black
     const overlay = document.getElementById('game-overlay');
     if (overlay) {
       overlay.style.opacity = '1';
-      overlay.style.backgroundColor = 'black';
       
-      // After fade completes, reset opacity (500ms duration)
+      // After delay, fade back out
       setTimeout(() => {
         overlay.style.opacity = '0';
       }, 500);
     }
     
-    // Auto-save game state
-    if (window.farmScene && typeof window.farmScene.saveGame === 'function') {
+    // Deduct 10% of current money
+    const newMoney = Math.floor(state.money * 0.9);
+    store.dispatch({ type: 'money/update', payload: newMoney });
+    
+    // Reset energy to max
+    store.dispatch({ 
+      type: 'energy/resetToMax', 
+      payload: state.energyMax 
+    });
+    
+    // Auto-save game after pass-out
+    if (window.farmScene && window.farmScene.saveGame) {
       window.farmScene.saveGame();
     }
   }
