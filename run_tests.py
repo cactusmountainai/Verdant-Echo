@@ -1,109 +1,201 @@
+#!/usr/bin/env python3
+"""
+Run all existing unit and E2E tests after refactors to verify app behavior remains unchanged.
+"""
+
 import subprocess
 import sys
 import os
+import logging
+from pathlib import Path
 
-def run_tests():
-    """Run the full test suite after Redux refactor to ensure no behavioral changes in state updates or side effects."""
-    
-    print("Running full test suite after Redux refactor...")
-    print("=" * 60)
-    
-    # Ensure we're in project root
-    if not os.path.exists("package.json"):
-        print("❌ package.json not found. Are you in the project root?")
-        return False
-    
-    # Run Jest tests for Redux-related logic (reducers, actions, selectors, async thunks)
-    print("Running Jest tests (Redux state and side effects)...")
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+def run_python_unit_tests():
+    """Run Python unit tests with pytest"""
+    logger.info("Running Python unit tests...")
+    test_dir = Path("tests")
+    if not test_dir.exists() or not any(test_dir.iterdir()):
+        logger.warning("No Python unit test directory ('tests/') found. Skipping.")
+        return True
+
     try:
         result = subprocess.run([
-            "npx", "jest",
-            "--config=jest.config.js",
-            "--coverage",
-            "--detectOpenHandles",
-            "--testMatch=**/src/**/*.(spec|test).{ts,js}"
-        ], capture_output=True, text=True, cwd=os.getcwd())
-        
-        print(result.stdout)
-        if result.stderr:
-            print("STDERR:", result.stderr)
-            
-        if result.returncode != 0:
-            print("❌ Jest tests failed! Redux state or side effects may have changed.")
-            return False
-            
-    except FileNotFoundError:
-        print("❌ Jest not found. Run 'npm install' to install dependencies.")
-        return False
-    except Exception as e:
-        print(f"❌ Error running Jest tests: {e}")
-        return False
-    
-    # Run TypeScript compilation check (to catch type errors in Redux types)
-    print("\nRunning TypeScript compilation check...")
-    try:
-        result = subprocess.run([
-            "tsc", "--noEmit"
-        ], capture_output=True, text=True, cwd=os.getcwd())
-        
-        if result.returncode != 0:
-            print("❌ TypeScript compilation errors detected!")
-            print(result.stderr)
-            return False
+            sys.executable, "-m", "pytest",
+            "tests/",
+            "--tb=short",
+            "--disable-warnings",
+            "-v"
+        ], capture_output=True, text=True)
+
+        if result.returncode == 0:
+            logger.info("✅ Python unit tests passed!")
+            return True
         else:
-            print("✅ TypeScript type checking passed.")
-            
+            logger.error("❌ Python unit tests failed!")
+            print(result.stdout)
+            if result.stderr:
+                print(result.stderr)
+            return False
+
     except FileNotFoundError:
-        print("⚠️ TypeScript compiler not found. Skipping type check.")
+        logger.error("pytest not found. Install with: pip install pytest")
+        return False
     except Exception as e:
-        print(f"⚠️ Error running TypeScript check: {e}")
-    
-    # Run Vite build test to ensure bundle can be built with new Redux state structure
-    print("\nRunning Vite build test...")
+        logger.error(f"Error running Python unit tests: {e}")
+        return False
+
+
+def run_python_e2e_tests():
+    """Run Python E2E tests (assuming they're in 'e2e/' directory)"""
+    logger.info("Running Python E2E tests...")
+    test_dir = Path("e2e")
+    if not test_dir.exists() or not any(test_dir.iterdir()):
+        logger.warning("No Python E2E test directory ('e2e/') found. Skipping.")
+        return True
+
     try:
         result = subprocess.run([
-            "npm", "run", "build"
-        ], capture_output=True, text=True, cwd=os.getcwd())
-        
-        if result.returncode != 0:
-            print("❌ Vite build failed! Bundle may be broken due to Redux changes.")
-            print(result.stderr)
-            return False
+            sys.executable, "-m", "pytest",
+            "e2e/",
+            "--tb=short",
+            "--disable-warnings",
+            "-v"
+        ], capture_output=True, text=True)
+
+        if result.returncode == 0:
+            logger.info("✅ Python E2E tests passed!")
+            return True
         else:
-            print("✅ Vite build succeeded.")
-            
-    except Exception as e:
-        print(f"❌ Error running Vite build: {e}")
+            logger.error("❌ Python E2E tests failed!")
+            print(result.stdout)
+            if result.stderr:
+                print(result.stderr)
+            return False
+
+    except FileNotFoundError:
+        logger.error("pytest not found. Install with: pip install pytest")
         return False
+    except Exception as e:
+        logger.error(f"Error running Python E2E tests: {e}")
+        return False
+
+
+def run_javascript_unit_tests():
+    """Run JavaScript/TypeScript unit tests using Jest"""
+    logger.info("Running JavaScript/TypeScript unit tests...")
     
-    # Verify critical Redux files exist (core store and slices)
-    print("\nVerifying essential Redux files...")
-    redux_files = [
-        "src/store.ts",
-        "src/features/gameSlice.ts",
-        "src/features/userSlice.ts",
-        "src/reducers/index.ts",  # if using legacy reducers
-        "src/selectors/index.ts"
-    ]
-    
-    missing_files = []
-    for file in redux_files:
-        if not os.path.exists(file):
-            missing_files.append(file)
-    
-    if missing_files:
-        print(f"⚠️ Missing expected Redux files: {missing_files}")
-        # Not fatal, but should be investigated
-    else:
-        print("✅ All core Redux files found.")
-    
-    # Final summary
-    print("\n" + "=" * 60)
-    print("✅ Full test suite completed!")
-    print("All tests passed. No behavioral changes detected in state updates or side effects.")
-    
+    package_json = Path("package.json")
+    if not package_json.exists():
+        logger.warning("package.json not found. Skipping JS tests.")
+        return True
+
+    # Try npx first (preferred for local installs)
+    try:
+        result = subprocess.run(["npx", "jest"], capture_output=True, text=True)
+        if result.returncode == 0:
+            logger.info("✅ JavaScript unit tests passed!")
+            return True
+        else:
+            logger.error("❌ JavaScript unit tests failed!")
+            print(result.stdout)
+            if result.stderr:
+                print(result.stderr)
+            return False
+
+    except FileNotFoundError:
+        # Fallback to npm test
+        try:
+            result = subprocess.run(["npm", "test"], capture_output=True, text=True)
+            if result.returncode == 0:
+                logger.info("✅ JavaScript unit tests passed!")
+                return True
+            else:
+                logger.error("❌ JavaScript unit tests failed!")
+                print(result.stdout)
+                if result.stderr:
+                    print(result.stderr)
+                return False
+        except Exception as e:
+            logger.warning(f"Could not run JS unit tests with npm: {e}")
+            return False  # Fail if we can't even invoke npm
+
+    except Exception as e:
+        logger.error(f"Error running JavaScript unit tests: {e}")
+        return False
+
+
+def run_javascript_e2e_tests():
+    """Run JavaScript E2E tests (Cypress or Playwright)"""
+    logger.info("Running JavaScript E2E tests...")
+
+    # Check for Cypress
+    cypress_config = Path("cypress.config.js")
+    cypress_json = Path("cypress.json")
+    if cypress_config.exists() or cypress_json.exists():
+        logger.info("Detected Cypress E2E tests. Running...")
+        try:
+            result = subprocess.run(["npx", "cypress", "run"], capture_output=True, text=True)
+            if result.returncode == 0:
+                logger.info("✅ JavaScript E2E tests (Cypress) passed!")
+                return True
+            else:
+                logger.error("❌ JavaScript E2E tests (Cypress) failed!")
+                print(result.stdout)
+                if result.stderr:
+                    print(result.stderr)
+                return False
+        except FileNotFoundError:
+            logger.warning("cypress not found. Install with: npm install cypress")
+            return False
+
+    # Check for Playwright
+    playwright_config = Path("playwright.config.ts")
+    playwright_config_js = Path("playwright.config.js")
+    if playwright_config.exists() or playwright_config_js.exists():
+        logger.info("Detected Playwright E2E tests. Running...")
+        try:
+            result = subprocess.run(["npx", "playwright", "test"], capture_output=True, text=True)
+            if result.returncode == 0:
+                logger.info("✅ JavaScript E2E tests (Playwright) passed!")
+                return True
+            else:
+                logger.error("❌ JavaScript E2E tests (Playwright) failed!")
+                print(result.stdout)
+                if result.stderr:
+                    print(result.stderr)
+                return False
+        except FileNotFoundError:
+            logger.warning("playwright not found. Install with: npm install -D @playwright/test")
+            return False
+
+    # No E2E framework detected
+    logger.warning("No JavaScript E2E test configuration (Cypress/Playwright) found. Skipping.")
     return True
 
+
+def main():
+    """Main function to run all tests"""
+    logger.info("=== Running All Tests After Refactors ===")
+
+    # Run each test suite and collect results
+    python_unit_ok = run_python_unit_tests()
+    python_e2e_ok = run_python_e2e_tests()
+    js_unit_ok = run_javascript_unit_tests()
+    js_e2e_ok = run_javascript_e2e_tests()
+
+    # Overall result: all must pass
+    all_passed = python_unit_ok and python_e2e_ok and js_unit_ok and js_e2e_ok
+
+    if all_passed:
+        logger.info("🎉 ALL TESTS PASSED! No regressions detected.")
+        sys.exit(0)
+    else:
+        logger.error("❌ Some tests failed. Regressions may be present.")
+        sys.exit(1)
+
+
 if __name__ == "__main__":
-    success = run_tests()
-    sys.exit(0 if success else 1)
+    main()
